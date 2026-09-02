@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     UserListAPI,
     UserAPI,
-    UserCreateAPI
+    UserCreateAPI,
+    get_profile
 )
 
 
@@ -25,5 +26,11 @@ urlpatterns = [
         route="users/new",
         view=UserCreateAPI.as_view(),
         name="user-new"
+    ),
+    path(
+        route="profile",
+        view=get_profile,
+        name="user-profile"
     )
+
 ]

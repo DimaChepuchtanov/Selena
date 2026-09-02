@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 from typing import override
+from uuid import uuid4
 
 from django.utils.translation import gettext_lazy
 from django.db.models import UUIDField, Model, IntegerField, IntegerChoices
@@ -16,7 +17,8 @@ class UserRole(Model):
     uuid: UUIDField[UUID, UUID] = UUIDField(
         verbose_name="Уникальный номер роли",
         primary_key=True,
-        editable=False
+        editable=False,
+        default=uuid4
     )
 
     name: IntegerField[int, int] = IntegerField(
