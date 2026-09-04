@@ -1,0 +1,22 @@
+from __future__ import annotations
+
+from typing import Final, Any
+
+
+TEMPLATES: Final[list[dict[str, Any]]] = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
+STATIC_URL = 'static/'
