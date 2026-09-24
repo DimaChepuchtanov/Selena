@@ -19,7 +19,6 @@ class Config:
             "PG_DATABASE": cls.PG_DATABASE
         }
 
-        print(required_variables)
         missing_variables = [
             name 
             for name, value in required_variables.items()
