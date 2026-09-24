@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 from uuid import uuid4
 
 from django.db.models import Model, UUIDField, CharField, TextChoices
@@ -27,3 +27,13 @@ class Role(Model):
         choices=RoleChoices.choices,
         default=RoleChoices.USER
     )
+
+    @override
+    def __str__(self) -> str:
+        return self.role
+    
+    class Meta:
+        db_table = '"identity"."role"'
+        default_related_name = 'role'
+
+    

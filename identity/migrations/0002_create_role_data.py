@@ -12,7 +12,7 @@ def insert_data(app, schema):
     role_model.objects.create()
 
     role_model.objects.create(
-        role='Admin'
+        role='Администратор'
     )
 
     
@@ -20,7 +20,9 @@ def insert_data(app, schema):
 def delete_data(app, schema):
     role_model: Role = app.get_model("identity", "Role")
 
-    role_model.objects.delete()
+    database_alias = schema.connection.alias
+
+    role_model.objects.using(database_alias).all().delete()
 
 
 class Migration(migrations.Migration):
