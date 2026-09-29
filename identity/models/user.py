@@ -29,7 +29,8 @@ class User(AbstractBaseUser):
 
     role: ForeignKey[Role, Role] = ForeignKey(
         to=Role,
-        on_delete=PROTECT
+        on_delete=PROTECT,
+        default=Role.RoleChoices.USER
     )
 
     class Meta:
