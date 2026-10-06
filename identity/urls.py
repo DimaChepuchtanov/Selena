@@ -1,10 +1,8 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import UserViewSet
+from rest_framework.routers import BaseRouter
+from .views import UserResponse
 
-router = DefaultRouter()
-router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("user/<uuid>", UserResponse.as_view(), name="with uuid"),
 ]

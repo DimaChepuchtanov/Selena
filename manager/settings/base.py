@@ -22,6 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-)6t3&)=_h@bth_gah)7k(+h^z35lcc39#69fz4x=5tt%f6@b7='
 
+AUTH_USER_MODEL = 'identity.User'
 
 # Application definition
 ROOT_URLCONF = 'manager.urls'

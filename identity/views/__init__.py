@@ -1,3 +1,2 @@
-from .user import UserViewSet
-
-__all__ = ['UserViewSet']
+from .user import UserResponse
+__all__ = ['UserResponse']
