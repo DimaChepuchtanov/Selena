@@ -10,4 +10,5 @@ INSTALLED_APPS: Final[list[str]] = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pages',
 ]
