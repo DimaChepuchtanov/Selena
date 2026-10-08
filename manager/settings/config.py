@@ -11,6 +11,8 @@ class Config:
     PG_PORT = os.getenv("PG_PORT", 5432)
     PG_DATABASE = os.getenv("PG_DATABASE", None)
 
+    SECRET_KEY = os.getenv("SECRET_KEY", None)
+
     @classmethod
     def validate(cls) -> None:
         required_variables = {
