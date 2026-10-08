@@ -1,6 +1,53 @@
 (() => {
   /*
    * ==========================================================
+   * АВТОРИЗАЦИЯ
+   * ==========================================================
+   *
+   * Пока считаем, что после успешной авторизации backend
+   * сохраняет токен в localStorage под ключом "auth_token".
+   *
+   * Если у вас будет другое имя ключа, измените AUTH_TOKEN_KEY.
+   * Если позже перейдете на HttpOnly-cookie/Django session,
+   * эту проверку лучше заменить на запрос к backend.
+   */
+
+  const AUTH_TOKEN_KEY = "auth_token";
+  const AUTH_PAGE_URL = "/auth";
+  const PROFILE_PAGE_URL = "/profile";
+
+  function getAuthToken() {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+  }
+
+  function isUserAuthenticated() {
+    const token = getAuthToken();
+    return Boolean(token && token.trim() !== "");
+  }
+
+  function goToProfile(event) {
+    event.preventDefault();
+
+    if (isUserAuthenticated()) {
+      window.location.href = PROFILE_PAGE_URL;
+      return;
+    }
+
+    window.location.href =
+      AUTH_PAGE_URL +
+      "?next=" +
+      encodeURIComponent(PROFILE_PAGE_URL);
+  }
+
+  document
+    .querySelectorAll(".auth-profile-link")
+    .forEach(link => {
+      link.addEventListener("click", goToProfile);
+    });
+
+
+  /*
+   * ==========================================================
    * ДАННЫЕ
    * ==========================================================
    *
