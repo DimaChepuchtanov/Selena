@@ -10,7 +10,8 @@ INSTALLED_APPS: Final[list[str]] = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'rest_framework',
+    'drf_spectacular',
     # CUSTOM
     'identity',
     'pages',
