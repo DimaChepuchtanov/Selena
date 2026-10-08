@@ -9,11 +9,11 @@ from ..config import Config
 
 DATABASES: Final[dict[str, dict[str, Any]]] = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Для psycopg2: 'django.db.backends.postgresql_psycopg2'
-        'NAME': Config.PG_DATABASE,                      # Имя базы данных
-        'USER': Config.PG_USER,                          # Имя пользователя
-        'PASSWORD': Config.PG_PASSWORD,                    # Пароль
-        'HOST': Config.PG_HOST,                       # Хост (если база на локальной машине)
-        'PORT': Config.PG_PORT,                          # Порт (стандартный для PostgreSQL)
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': Config.PG_DATABASE,
+        'USER': Config.PG_USER,
+        'PASSWORD': Config.PG_PASSWORD,
+        'HOST': Config.PG_HOST,
+        'PORT': Config.PG_PORT,
     }
 }
