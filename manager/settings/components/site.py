@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import os
 from typing import Final, Any
+
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 TEMPLATES: Final[list[dict[str, Any]]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -19,4 +25,5 @@ TEMPLATES: Final[list[dict[str, Any]]] = [
 ]
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
