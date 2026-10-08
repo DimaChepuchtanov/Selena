@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PG_DATABASE:-selena}
+      POSTGRES_USER: ${PG_USER:-selena}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-change-me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: manager.settings.dev
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_DATABASE: ${PG_DATABASE:-selena}
+      PG_USER: ${PG_USER:-selena}
+      PG_PASSWORD: ${PG_PASSWORD:-change-me}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+
+volumes:
+  postgres_data:

@@ -16,13 +16,6 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)6t3&)=_h@bth_gah)7k(+h^z35lcc39#69fz4x=5tt%f6@b7='
-
-
 # Application definition
 ROOT_URLCONF = 'manager.urls'
 
@@ -41,12 +34,3 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
