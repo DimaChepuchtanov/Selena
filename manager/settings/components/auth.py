@@ -20,3 +20,5 @@ AUTH_PASSWORD_VALIDATORS: Final[list[dict[str, str]]] = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = "identity.User"
