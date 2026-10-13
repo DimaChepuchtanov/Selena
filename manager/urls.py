@@ -25,8 +25,8 @@ from pages.views import main_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main_page)
-    path('api/', include('identity.urls')),
+    path('', main_page),
+    path('user/', include('identity.urls')),
 
     # Swagger UI endpoints
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

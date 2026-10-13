@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, override, ClassVar
 from uuid import uuid4
 
+from django.contrib.auth.base_user import BaseUserManager
 from django.db.models import UUIDField, EmailField, ForeignKey, PROTECT, Manager, QuerySet
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
@@ -21,8 +22,14 @@ class UserQuerySet(QuerySet['User']):
     def get_users(self) -> UserQuerySet:
         return self.all()
 
+    def create_user(self, login: str, password: str, **extra_fields) -> User:
+        user = self.model(login=login, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class UserManager(Manager['User']):
+
+class UserManager(BaseUserManager['User']):
     @override
     def get_queryset(self) -> UserQuerySet:
         return UserQuerySet(model=self.model, using=self._db)
@@ -33,11 +40,15 @@ class UserManager(Manager['User']):
     def get_users(self) -> UserQuerySet:
         return self.get_queryset().get_users()
 
+    def create_user(self, login: str, password: str, **extra_fields) -> User:
+        return self.get_queryset().create_user(login=login, password=password, **extra_fields)
+
 
 class User(AbstractBaseUser):
     uuid: UUIDField[UUID, UUID] = UUIDField(
         verbose_name=_("Уникальный номер пользователя"),
         primary_key=True,
+        editable=False,
         default=uuid4
     )
 
@@ -50,7 +61,7 @@ class User(AbstractBaseUser):
     role: ForeignKey[Role, Role] = ForeignKey(
         to=Role,
         on_delete=PROTECT,
-        default=Role.RoleChoices.USER
+        default=lambda: Role.objects.get(uuid='ad369c1c-f1a8-47f4-9853-d4c50e2e4e6c'),
     )
 
     objects: ClassVar[UserManager] = UserManager()

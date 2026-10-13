@@ -1,8 +1,10 @@
-from django.urls import path, include
-from rest_framework.routers import BaseRouter
-from .views import UserResponse
+from django.urls import path
+from .views import login_view, register_view
 
+
+app_name = "identity"
 
 urlpatterns = [
-    path("user/<uuid>", UserResponse.as_view(), name="with uuid"),
+    path("auth/", login_view, name="login"),
+    path("reg/", register_view, name="register"),
 ]
