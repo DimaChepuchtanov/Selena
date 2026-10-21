@@ -1,0 +1,1461 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#06111f">
+<title>Профиль — Selena Znaju</title>
+
+<style>
+:root{
+  --bg:#06111f;
+  --bg-deep:#020813;
+  --panel:rgba(5,14,27,.76);
+  --panel-strong:rgba(4,10,20,.96);
+  --gold:#d5ae68;
+  --gold-2:#f0d79f;
+  --text:#f4eadb;
+  --muted:#b9afa2;
+  --line:rgba(213,174,104,.34);
+  --line-soft:rgba(255,255,255,.08);
+  --danger:#d87e79;
+  --success:#9fca9c;
+  --shadow:0 24px 70px rgba(0,0,0,.38);
+  --radius:20px;
+  --max:1380px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  overflow-x:hidden;
+  font-family:Georgia,"Times New Roman",serif;
+  background:
+    linear-gradient(rgba(2,8,17,.16),rgba(2,7,14,.48)),
+    url("./assets/constellations.svg") top center/1600px auto repeat-y,
+    url("./assets/stars-bg.jpg") center top/1100px auto repeat;
+  background-color:var(--bg);
+}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{color:inherit}
+img{display:block;max-width:100%}
+.container{width:min(var(--max),calc(100% - 48px));margin-inline:auto}
+
+/* HEADER */
+.header{
+  position:sticky;top:0;z-index:100;
+  border-bottom:1px solid var(--line);
+  background:rgba(3,9,18,.84);
+  backdrop-filter:blur(17px);
+}
+.header__inner{
+  min-height:78px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:34px;
+  align-items:center;
+}
+.brand{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.brand__mark{
+  width:45px;height:45px;border-radius:50%;
+  border:1px solid var(--line);
+  display:grid;place-items:center;
+  color:var(--gold-2);font-size:31px;
+}
+.brand__name{display:block;color:var(--gold-2);font-size:25px;line-height:1}
+.brand__sub{
+  display:block;margin-top:5px;
+  color:#bcb1a0;
+  font:9px/1 Arial,sans-serif;
+  letter-spacing:2.4px;text-transform:uppercase;
+}
+.nav{display:flex;justify-content:center;gap:clamp(18px,2vw,34px)}
+.nav a{position:relative;color:#e6dccf;font-size:14px}
+.nav a::after{
+  content:"";position:absolute;left:0;right:100%;bottom:-10px;height:1px;
+  background:var(--gold);transition:right .2s;
+}
+.nav a:hover{color:var(--gold-2)}
+.nav a:hover::after{right:0}
+.header__actions{display:flex;align-items:center;gap:5px}
+.icon-btn{
+  width:42px;height:42px;padding:0;border:0;border-radius:50%;
+  background:transparent;display:grid;place-items:center;cursor:pointer;
+}
+.icon-btn:hover{background:rgba(213,174,104,.07);color:var(--gold-2)}
+.icon-btn svg{
+  width:20px;height:20px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;
+}
+.menu-btn{display:none}
+
+/* MOBILE MENU */
+.mobile-menu{
+  position:fixed;inset:0;z-index:180;padding:95px 24px 30px;
+  background:rgba(2,7,15,.985);
+  opacity:0;visibility:hidden;transition:.2s;
+}
+.mobile-menu.open{opacity:1;visibility:visible}
+.mobile-menu nav{max-width:420px;margin:auto;display:flex;flex-direction:column}
+.mobile-menu nav a{padding:17px 0;border-bottom:1px solid var(--line-soft);font-size:24px}
+.mobile-menu__close{position:absolute;right:20px;top:18px}
+
+/* PAGE HEADER */
+.page-head{padding:64px 0 30px}
+.page-head__kicker{
+  margin-bottom:9px;color:var(--gold);
+  font:10px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase
+}
+.page-head h1{
+  margin:0;color:#f3e7d4;font-size:clamp(40px,5vw,66px);
+  font-weight:400;line-height:1;
+}
+.page-head p{
+  max-width:700px;margin:13px 0 0;
+  color:var(--muted);font:14px/1.65 Arial,sans-serif
+}
+
+/* LAYOUT */
+.profile-layout{
+  padding:0 0 80px;
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  gap:24px;
+  align-items:start;
+}
+
+/* USER CARD */
+.user-card{
+  position:sticky;top:102px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(74,112,158,.18),transparent 36%),
+    linear-gradient(180deg,rgba(8,22,40,.88),rgba(3,10,20,.96));
+  box-shadow:var(--shadow);
+}
+.user-card__top{
+  position:relative;padding:34px 26px 28px;text-align:center;
+  border-bottom:1px solid rgba(213,174,104,.17);
+}
+.user-card__top::before{
+  content:"";position:absolute;width:210px;height:210px;left:50%;top:-118px;
+  transform:translateX(-50%);border:1px solid rgba(213,174,104,.13);
+  border-radius:50%;
+}
+.avatar-wrap{
+  position:relative;width:132px;height:132px;margin:0 auto 19px;
+}
+.avatar{
+  width:132px;height:132px;overflow:hidden;border-radius:50%;
+  border:1px solid rgba(240,215,159,.64);
+  display:grid;place-items:center;
+  background:
+    radial-gradient(circle at 42% 35%,rgba(239,218,175,.22),transparent 22%),
+    linear-gradient(145deg,#152b45,#06101d);
+  color:var(--gold-2);font-size:45px;
+  box-shadow:0 0 0 8px rgba(213,174,104,.035),0 18px 45px rgba(0,0,0,.35);
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-edit{
+  position:absolute;right:1px;bottom:3px;width:39px;height:39px;padding:0;
+  border:1px solid var(--line);border-radius:50%;
+  background:#081321;color:var(--gold-2);cursor:pointer;
+  display:grid;place-items:center;
+}
+.avatar-input{display:none}
+.user-name{margin:0;color:#f0e4d0;font-size:27px;font-weight:400}
+.user-date{
+  margin-top:8px;color:var(--muted);
+  font:12px Arial,sans-serif
+}
+.user-date strong{color:#ddd3c3;font-weight:400}
+
+.user-card__meta{padding:18px 22px 22px}
+.user-meta-row{
+  display:flex;justify-content:space-between;gap:15px;
+  padding:13px 0;border-bottom:1px solid var(--line-soft);
+  font:12px Arial,sans-serif
+}
+.user-meta-row:last-child{border-bottom:0}
+.user-meta-row span:first-child{color:var(--muted)}
+.user-meta-row span:last-child{color:#e5dacb;text-align:right}
+
+.side-nav{
+  padding:15px;
+  display:flex;flex-direction:column;gap:7px;
+  border-top:1px solid rgba(213,174,104,.16);
+}
+.side-tab{
+  min-height:48px;padding:0 15px;border:1px solid transparent;border-radius:13px;
+  background:transparent;color:#dcd2c5;cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:11px;
+  font:13px Arial,sans-serif;transition:.2s;
+}
+.side-tab:hover{background:rgba(213,174,104,.05);border-color:rgba(213,174,104,.13)}
+.side-tab.active{
+  color:#10141c;border-color:#f0d79f;
+  background:linear-gradient(135deg,#f0d9aa,#b9894b);
+}
+.side-tab__icon{
+  width:29px;height:29px;display:grid;place-items:center;
+  border:1px solid currentColor;border-radius:50%;font-family:Georgia,serif;
+}
+
+/* CONTENT */
+.content-card{
+  min-width:0;
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:rgba(3,10,20,.70);
+  backdrop-filter:blur(7px);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.content-head{
+  padding:28px 30px 23px;
+  border-bottom:1px solid rgba(213,174,104,.17);
+  display:flex;justify-content:space-between;gap:24px;align-items:flex-start;
+}
+.content-head__kicker{
+  margin-bottom:7px;color:var(--gold);
+  font:10px Arial,sans-serif;letter-spacing:2.7px;text-transform:uppercase
+}
+.content-head h2{margin:0;color:#f0e4d1;font-size:34px;font-weight:400}
+.content-head p{
+  max-width:680px;margin:8px 0 0;color:var(--muted);
+  font:13px/1.6 Arial,sans-serif
+}
+.content-body{padding:28px 30px 32px}
+
+/* DELIVERY */
+.service-tabs{
+  display:flex;gap:9px;flex-wrap:wrap;margin-bottom:25px
+}
+.service-tab{
+  min-height:43px;padding:0 18px;border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.02);cursor:pointer;color:#ddd3c5;
+  font:12px Arial,sans-serif
+}
+.service-tab.active{
+  color:#0e131b;border-color:#f0d79f;
+  background:linear-gradient(135deg,#f0d9aa,#ba894b)
+}
+.delivery-panel{display:none}
+.delivery-panel.active{display:block}
+
+.delivery-intro{
+  margin-bottom:21px;padding:15px 17px;
+  border:1px solid rgba(213,174,104,.16);border-radius:15px;
+  background:rgba(24,48,76,.25);
+  color:#c9c0b4;font:12px/1.55 Arial,sans-serif
+}
+.delivery-intro strong{color:var(--gold-2);font-weight:500}
+
+.mode-switch{
+  display:inline-flex;padding:4px;margin-bottom:23px;
+  border:1px solid var(--line);border-radius:999px;
+  background:rgba(2,8,17,.7)
+}
+.mode-btn{
+  min-height:38px;padding:0 16px;border:0;border-radius:999px;
+  background:transparent;color:#bfb5a7;cursor:pointer;font:12px Arial,sans-serif
+}
+.mode-btn.active{
+  color:#0e131b;background:linear-gradient(135deg,#f0d9aa,#ba894b)
+}
+
+.form-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px
+}
+.form-field{min-width:0}
+.form-field.full{grid-column:1/-1}
+.form-field label{
+  display:block;margin-bottom:8px;color:#d8cfc1;
+  font:12px Arial,sans-serif
+}
+.form-field .hint{
+  margin-top:6px;color:#8f867b;font:10px/1.4 Arial,sans-serif
+}
+.required{color:var(--gold)}
+.input,.select,.textarea{
+  width:100%;min-height:48px;padding:0 14px;
+  border:1px solid rgba(213,174,104,.23);border-radius:12px;
+  outline:0;background:rgba(2,8,17,.68);color:#f4eadb;
+  font:14px Arial,sans-serif;transition:.2s
+}
+.textarea{min-height:92px;padding:13px 14px;resize:vertical}
+.input:focus,.select:focus,.textarea:focus{
+  border-color:rgba(240,215,159,.68);
+  box-shadow:0 0 0 3px rgba(213,174,104,.06)
+}
+.select option{background:#081321;color:#fff}
+.hidden{display:none !important}
+
+.form-actions{
+  margin-top:26px;padding-top:22px;border-top:1px solid var(--line-soft);
+  display:flex;justify-content:flex-end;gap:10px;align-items:center;flex-wrap:wrap
+}
+.save-btn{
+  min-height:46px;padding:0 21px;border:1px solid #f0d79f;border-radius:999px;
+  background:linear-gradient(135deg,#f1daaa,#b98848);color:#0e131b;
+  cursor:pointer;font:600 12px Arial,sans-serif
+}
+.status-text{
+  color:var(--success);font:11px Arial,sans-serif;min-height:14px
+}
+
+/* HISTORY */
+.history-list{display:grid;gap:13px}
+.history-item{
+  padding:18px;border:1px solid rgba(213,174,104,.18);border-radius:17px;
+  background:linear-gradient(135deg,rgba(15,33,54,.54),rgba(3,10,19,.75));
+  display:grid;grid-template-columns:70px 1fr auto;gap:16px;align-items:center
+}
+.history-thumb{
+  width:70px;height:88px;border-radius:11px;overflow:hidden;
+  border:1px solid var(--line);background:#081321;display:grid;place-items:center;
+  color:var(--gold-2);font-size:25px
+}
+.history-thumb img{width:100%;height:100%;object-fit:cover}
+.history-name{font-size:18px;color:#eee1cf}
+.history-meta{margin-top:7px;color:var(--muted);font:11px/1.5 Arial,sans-serif}
+.history-side{text-align:right}
+.history-price{color:var(--gold-2);font-size:18px}
+.history-status{
+  margin-top:7px;color:#bcb2a5;font:10px Arial,sans-serif;
+  text-transform:uppercase;letter-spacing:1px
+}
+.history-link{
+  margin-top:9px;display:inline-block;color:#d5bd91;
+  font:11px Arial,sans-serif;text-decoration:underline;text-underline-offset:4px
+}
+
+.view-list{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px
+}
+.view-item{
+  overflow:hidden;border:1px solid rgba(213,174,104,.18);border-radius:17px;
+  background:linear-gradient(180deg,rgba(15,31,51,.76),rgba(4,11,20,.94))
+}
+.view-image{
+  aspect-ratio:.9;background:#081321;display:grid;place-items:center;
+  color:var(--gold-2);font-size:30px;overflow:hidden
+}
+.view-image img{width:100%;height:100%;object-fit:cover}
+.view-body{padding:15px}
+.view-name{font-size:17px;color:#eadfce}
+.view-date{margin-top:6px;color:var(--muted);font:10px Arial,sans-serif}
+.view-price{margin-top:12px;color:var(--gold-2);font-size:18px}
+
+.empty-state{
+  min-height:280px;padding:35px;display:grid;place-items:center;text-align:center;
+  border:1px dashed rgba(213,174,104,.30);border-radius:18px;
+  background:
+    radial-gradient(circle at center,rgba(45,81,119,.16),transparent 43%),
+    rgba(4,12,23,.34)
+}
+.empty-state__icon{
+  width:78px;height:78px;margin:0 auto 16px;display:grid;place-items:center;
+  border:1px solid var(--line);border-radius:20px;color:var(--gold-2);font-size:34px
+}
+.empty-state h3{margin:0;color:#eadfcf;font-size:24px;font-weight:400}
+.empty-state p{
+  max-width:480px;margin:10px auto 0;color:var(--muted);
+  font:13px/1.6 Arial,sans-serif
+}
+
+/* FOOTER */
+.footer{
+  border-top:1px solid var(--line);background:rgba(2,7,14,.82);backdrop-filter:blur(7px)
+}
+.footer__inner{
+  min-height:110px;display:flex;justify-content:space-between;align-items:center;gap:24px
+}
+.footer__text{color:#8e8579;font:10px Arial,sans-serif}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .nav{gap:17px}
+  .nav a:nth-last-child(-n+2){display:none}
+  .profile-layout{grid-template-columns:280px minmax(0,1fr)}
+  .view-list{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:850px){
+  .container{width:min(var(--max),calc(100% - 32px))}
+  .header__inner{grid-template-columns:1fr auto}
+  .nav{display:none}
+  .menu-btn{display:grid}
+  .profile-layout{grid-template-columns:1fr}
+  .user-card{position:static}
+  .user-card__top{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;text-align:left}
+  .avatar-wrap{margin:0}
+  .side-nav{display:grid;grid-template-columns:repeat(3,1fr)}
+  .side-tab{justify-content:center;text-align:center}
+  .side-tab__icon{display:none}
+}
+@media(max-width:620px){
+  .container{width:min(var(--max),calc(100% - 24px))}
+  .brand__name{font-size:19px}
+  .brand__sub{font-size:7px;letter-spacing:1.5px}
+  .brand__mark{width:38px;height:38px;font-size:27px}
+  .page-head{padding-top:45px}
+  .user-card__top{display:block;text-align:center}
+  .avatar-wrap{margin:0 auto 18px}
+  .side-nav{grid-template-columns:1fr}
+  .side-tab{justify-content:flex-start}
+  .side-tab__icon{display:grid}
+  .content-head,.content-body{padding-left:20px;padding-right:20px}
+  .content-head h2{font-size:29px}
+  .form-grid{grid-template-columns:1fr}
+  .form-field.full{grid-column:auto}
+  .service-tabs{display:grid;grid-template-columns:1fr 1fr}
+  .service-tab{width:100%}
+  .history-item{grid-template-columns:58px 1fr}
+  .history-thumb{width:58px;height:72px}
+  .history-side{grid-column:2;text-align:left}
+  .view-list{grid-template-columns:1fr}
+  .footer__inner{padding:25px 0;align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark">☾</span>
+      <span>
+        <span class="brand__name">Selena Znaju</span>
+        <span class="brand__sub">Авторские карты Таро и оракулы</span>
+      </span>
+    </a>
+
+    <nav class="nav">
+      <a href="/">Каталог</a>
+      <a href="/#collections">Колоды</a>
+      <a href="/#catalog">Оракулы</a>
+      <a href="/#accessories">Аксессуары</a>
+      <a href="/#author">Об авторе</a>
+      <a href="/#contacts">Контакты</a>
+    </nav>
+
+    <div class="header__actions">
+      <a class="icon-btn" href="/" aria-label="Главная">
+        <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V21h13V10.5"></path></svg>
+      </a>
+      <a class="icon-btn" href="/cart" aria-label="Корзина">
+        <svg viewBox="0 0 24 24"><path d="M3 4h2l2.3 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.6L21 7H6"></path><circle cx="10" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+      </a>
+      <button class="icon-btn menu-btn" id="openMenu" type="button" aria-label="Меню">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <button class="icon-btn mobile-menu__close" id="closeMenu" type="button" aria-label="Закрыть">✕</button>
+  <nav>
+    <a href="/">Главная</a>
+    <a href="/#collections">Колоды</a>
+    <a href="/#catalog">Оракулы</a>
+    <a href="/#accessories">Аксессуары</a>
+    <a href="/#author">Об авторе</a>
+    <a href="/#contacts">Контакты</a>
+  </nav>
+</div>
+
+<main>
+  <section class="page-head">
+    <div class="container">
+      <div class="page-head__kicker">Личный кабинет</div>
+      <h1>Мой профиль</h1>
+      <p>
+        Данные аккаунта, адреса доставки и история взаимодействия с авторскими колодами Selena Znaju.
+      </p>
+    </div>
+  </section>
+
+  <section class="container profile-layout">
+
+    <aside class="user-card">
+      <div class="user-card__top">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatarPreview">✦</div>
+
+          <button class="avatar-edit" id="avatarButton" type="button" aria-label="Изменить фотографию">
+            ✎
+          </button>
+
+          <input class="avatar-input" id="avatarInput" type="file" accept="image/*">
+        </div>
+
+        <div>
+          <h2 class="user-name" id="profileName">Имя пользователя</h2>
+          <div class="user-date">
+            С нами с <strong id="profileCreatedAt">—</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-card__meta">
+        <div class="user-meta-row">
+          <span>Имя</span>
+          <span id="metaName">—</span>
+        </div>
+        <div class="user-meta-row">
+          <span>Дата создания</span>
+          <span id="metaCreatedAt">—</span>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Разделы профиля">
+        <button class="side-tab active" type="button" data-profile-tab="delivery">
+          <span class="side-tab__icon">⌖</span>
+          <span>Доставка</span>
+        </button>
+
+        <button class="side-tab" type="button" data-profile-tab="purchases">
+          <span class="side-tab__icon">◇</span>
+          <span>История покупок</span>
+        </button>
+
+        <button class="side-tab" type="button" data-profile-tab="views">
+          <span class="side-tab__icon">◉</span>
+          <span>История просмотров</span>
+        </button>
+      </nav>
+    </aside>
+
+    <div class="content-card">
+
+      <!-- DELIVERY -->
+      <section class="tab-panel active" id="panel-delivery">
+        <div class="content-head">
+          <div>
+            <div class="content-head__kicker">Адреса и получатель</div>
+            <h2>Доставка</h2>
+            <p>
+              Данные хранятся отдельно для СДЭК и Почты России и могут редактироваться независимо.
+            </p>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div class="service-tabs" role="tablist" aria-label="Служба доставки">
+            <button class="service-tab active" type="button" data-delivery-tab="cdek">СДЭК</button>
+            <button class="service-tab" type="button" data-delivery-tab="russian-post">Почта России</button>
+          </div>
+
+          <!-- CDEK -->
+          <section class="delivery-panel active" id="delivery-cdek">
+            <div class="delivery-intro">
+              <strong>СДЭК:</strong> профиль учитывает данные получателя, город/регион и два сценария:
+              доставка в ПВЗ или курьером до двери.
+            </div>
+
+            <div class="mode-switch" aria-label="Способ доставки СДЭК">
+              <button class="mode-btn active" type="button" data-cdek-mode="pickup">В ПВЗ</button>
+              <button class="mode-btn" type="button" data-cdek-mode="courier">Курьером</button>
+            </div>
+
+            <form id="cdekForm">
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="cdekFio">ФИО получателя <span class="required">*</span></label>
+                  <input class="input" id="cdekFio" name="fio" type="text" maxlength="255" autocomplete="name" placeholder="Иванов Иван Иванович">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekPhone">Телефон <span class="required">*</span></label>
+                  <input class="input" id="cdekPhone" name="phone" type="tel" autocomplete="tel" placeholder="+7 999 123-45-67">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekEmail">E-mail</label>
+                  <input class="input" id="cdekEmail" name="email" type="email" autocomplete="email" placeholder="example@mail.ru">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekCountry">Страна</label>
+                  <input class="input" id="cdekCountry" name="country" type="text" value="Россия">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekRegion">Регион / область</label>
+                  <input class="input" id="cdekRegion" name="region" type="text" placeholder="Свердловская область">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekCity">Город <span class="required">*</span></label>
+                  <input class="input" id="cdekCity" name="city" type="text" placeholder="Екатеринбург">
+                </div>
+
+                <div class="form-field">
+                  <label for="cdekIndex">Почтовый индекс</label>
+                  <input class="input" id="cdekIndex" name="postal_code" type="text" inputmode="numeric" placeholder="620000">
+                </div>
+
+                <div class="form-field full" data-cdek-pickup>
+                  <label for="cdekPoint">Код ПВЗ СДЭК <span class="required">*</span></label>
+                  <input class="input" id="cdekPoint" name="delivery_point" type="text" placeholder="Например: MSK93">
+                  <div class="hint">Позже это поле лучше заменить поиском/выбором ПВЗ из API СДЭК.</div>
+                </div>
+
+                <div class="form-field full hidden" data-cdek-courier>
+                  <label for="cdekAddress">Адрес доставки <span class="required">*</span></label>
+                  <input class="input" id="cdekAddress" name="address" type="text" placeholder="ул. Ленина, д. 15, корп. 2, кв. 42">
+                  <div class="hint">На backend это значение можно передавать в адрес получения СДЭК.</div>
+                </div>
+
+                <div class="form-field full hidden" data-cdek-courier>
+                  <label for="cdekComment">Комментарий курьеру</label>
+                  <textarea class="textarea" id="cdekComment" name="comment" placeholder="Домофон, подъезд, этаж и т. п."></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <span class="status-text" id="cdekStatus"></span>
+                <button class="save-btn" type="submit">Сохранить данные СДЭК</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- RUSSIAN POST -->
+          <section class="delivery-panel" id="delivery-russian-post">
+            <div class="delivery-intro">
+              <strong>Почта России:</strong> адрес разбит на поля, которые удобно сопоставить с данными отправления:
+              индекс, регион, населённый пункт, улица, дом, корпус/строение и помещение.
+            </div>
+
+            <form id="postForm">
+              <div class="form-grid">
+                <div class="form-field full">
+                  <label for="postFio">ФИО получателя <span class="required">*</span></label>
+                  <input class="input" id="postFio" name="fio" type="text" maxlength="255" autocomplete="name" placeholder="Иванов Иван Иванович">
+                </div>
+
+                <div class="form-field">
+                  <label for="postPhone">Телефон <span class="required">*</span></label>
+                  <input class="input" id="postPhone" name="phone" type="tel" autocomplete="tel" placeholder="+7 999 123-45-67">
+                </div>
+
+                <div class="form-field">
+                  <label for="postIndex">Почтовый индекс <span class="required">*</span></label>
+                  <input class="input" id="postIndex" name="index" type="text" inputmode="numeric" maxlength="6" placeholder="115551">
+                </div>
+
+                <div class="form-field">
+                  <label for="postRegion">Регион / область <span class="required">*</span></label>
+                  <input class="input" id="postRegion" name="region" type="text" placeholder="г. Москва">
+                </div>
+
+                <div class="form-field">
+                  <label for="postPlace">Населённый пункт <span class="required">*</span></label>
+                  <input class="input" id="postPlace" name="place" type="text" placeholder="Москва">
+                </div>
+
+                <div class="form-field full">
+                  <label for="postStreet">Улица <span class="required">*</span></label>
+                  <input class="input" id="postStreet" name="street" type="text" placeholder="Каширское шоссе">
+                </div>
+
+                <div class="form-field">
+                  <label for="postHouse">Дом <span class="required">*</span></label>
+                  <input class="input" id="postHouse" name="house" type="text" placeholder="92">
+                </div>
+
+                <div class="form-field">
+                  <label for="postCorpus">Корпус</label>
+                  <input class="input" id="postCorpus" name="corpus" type="text" placeholder="3">
+                </div>
+
+                <div class="form-field">
+                  <label for="postBuilding">Строение</label>
+                  <input class="input" id="postBuilding" name="building" type="text" placeholder="1">
+                </div>
+
+                <div class="form-field">
+                  <label for="postRoom">Квартира / помещение</label>
+                  <input class="input" id="postRoom" name="room" type="text" placeholder="42">
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <span class="status-text" id="postStatus"></span>
+                <button class="save-btn" type="submit">Сохранить данные Почты России</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
+
+      <!-- PURCHASES -->
+      <section class="tab-panel" id="panel-purchases">
+        <div class="content-head">
+          <div>
+            <div class="content-head__kicker">Мои заказы</div>
+            <h2>История покупок</h2>
+            <p>
+              Здесь будут отображаться заказы, их статусы, даты, стоимость и переход к карточке покупки.
+            </p>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div class="history-list" id="purchaseList"></div>
+        </div>
+      </section>
+
+      <!-- VIEWS -->
+      <section class="tab-panel" id="panel-views">
+        <div class="content-head">
+          <div>
+            <div class="content-head__kicker">Недавно смотрели</div>
+            <h2>История просмотров</h2>
+            <p>
+              Последние просмотренные колоды можно подгружать с backend и использовать для возврата к интересующим товарам.
+            </p>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div class="view-list" id="viewList"></div>
+        </div>
+      </section>
+
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark">☾</span>
+      <span>
+        <span class="brand__name">Selena Znaju</span>
+        <span class="brand__sub">Авторские карты Таро</span>
+      </span>
+    </a>
+
+    <div class="footer__text">
+      © Selena Znaju. Авторские карты Таро.
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  /*
+   * ==========================================================
+   * GUARD ПРОФИЛЯ
+   * ==========================================================
+   *
+   * Оставлена та же логика, которая использовалась на главной:
+   * если нет localStorage.auth_token, отправляем на /auth.
+   *
+   * Если в Django будет session/HttpOnly cookie,
+   * эту проверку лучше перенести на backend.
+   */
+
+  /*
+   * ==========================================================
+   * ДАННЫЕ
+   * ==========================================================
+   *
+   * Сейчас это заглушки для frontend.
+   * Позже можно заменить на API/Django context.
+   */
+
+  const state = {
+    user: {
+      name: "Имя пользователя",
+      photo: "",
+      createdAt: null
+    },
+
+    delivery: {
+      cdek: {
+        mode: "pickup",
+        fio: "",
+        phone: "",
+        email: "",
+        country: "Россия",
+        region: "",
+        city: "",
+        postal_code: "",
+        delivery_point: "",
+        address: "",
+        comment: ""
+      },
+
+      russian_post: {
+        fio: "",
+        phone: "",
+        index: "",
+        region: "",
+        place: "",
+        street: "",
+        house: "",
+        corpus: "",
+        building: "",
+        room: ""
+      }
+    },
+
+    purchases: [],
+    views: []
+  };
+
+  /*
+   * ==========================================================
+   * HELPERS
+   * ==========================================================
+   */
+
+  function formatDate(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "—";
+    }
+
+    return new Intl.DateTimeFormat(
+      "ru-RU",
+      {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      }
+    ).format(date);
+  }
+
+  function formatPrice(value) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "";
+    }
+
+    return new Intl.NumberFormat(
+      "ru-RU"
+    ).format(number) + " ₽";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  /*
+   * ==========================================================
+   * PROFILE DATA
+   * ==========================================================
+   */
+
+  function renderUser() {
+    const name =
+      state.user.name ||
+      "Имя пользователя";
+
+    document.getElementById("profileName").textContent =
+      name;
+
+    document.getElementById("metaName").textContent =
+      name;
+
+    const createdAt =
+      formatDate(state.user.createdAt);
+
+    document.getElementById("profileCreatedAt").textContent =
+      createdAt;
+
+    document.getElementById("metaCreatedAt").textContent =
+      createdAt;
+
+    const avatar =
+      document.getElementById("avatarPreview");
+
+    if (state.user.photo) {
+      avatar.innerHTML =
+        '<img src="' +
+        escapeHtml(state.user.photo) +
+        '" alt="Фотография пользователя">';
+    } else {
+      avatar.textContent = "✦";
+    }
+  }
+
+  /*
+   * ==========================================================
+   * MAIN TABS
+   * ==========================================================
+   */
+
+  const profileTabs =
+    document.querySelectorAll("[data-profile-tab]");
+
+  const profilePanels =
+    document.querySelectorAll(".tab-panel");
+
+  function openProfileTab(name) {
+    profileTabs.forEach(tab => {
+      tab.classList.toggle(
+        "active",
+        tab.dataset.profileTab === name
+      );
+    });
+
+    profilePanels.forEach(panel => {
+      panel.classList.toggle(
+        "active",
+        panel.id === "panel-" + name
+      );
+    });
+  }
+
+  profileTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      openProfileTab(
+        tab.dataset.profileTab
+      );
+    });
+  });
+
+  /*
+   * ==========================================================
+   * DELIVERY SERVICE TABS
+   * ==========================================================
+   */
+
+  const deliveryTabs =
+    document.querySelectorAll("[data-delivery-tab]");
+
+  const deliveryPanels =
+    document.querySelectorAll(".delivery-panel");
+
+  deliveryTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const target =
+        tab.dataset.deliveryTab;
+
+      deliveryTabs.forEach(item => {
+        item.classList.toggle(
+          "active",
+          item === tab
+        );
+      });
+
+      deliveryPanels.forEach(panel => {
+        panel.classList.toggle(
+          "active",
+          panel.id === "delivery-" + target
+        );
+      });
+    });
+  });
+
+  /*
+   * ==========================================================
+   * CDEK MODE
+   * ==========================================================
+   */
+
+  const modeButtons =
+    document.querySelectorAll("[data-cdek-mode]");
+
+  function renderCdekMode() {
+    const isPickup =
+      state.delivery.cdek.mode === "pickup";
+
+    modeButtons.forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.cdekMode ===
+          state.delivery.cdek.mode
+      );
+    });
+
+    document
+      .querySelectorAll("[data-cdek-pickup]")
+      .forEach(element => {
+        element.classList.toggle(
+          "hidden",
+          !isPickup
+        );
+      });
+
+    document
+      .querySelectorAll("[data-cdek-courier]")
+      .forEach(element => {
+        element.classList.toggle(
+          "hidden",
+          isPickup
+        );
+      });
+  }
+
+  modeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      state.delivery.cdek.mode =
+        button.dataset.cdekMode;
+
+      renderCdekMode();
+    });
+  });
+
+  /*
+   * ==========================================================
+   * FORM MAPPING
+   * ==========================================================
+   */
+
+  function fillForm(form, data) {
+    Object.entries(data).forEach(
+      ([key, value]) => {
+        const field =
+          form.elements.namedItem(key);
+
+        if (
+          field &&
+          typeof value !== "object"
+        ) {
+          field.value =
+            value ?? "";
+        }
+      }
+    );
+  }
+
+  function formToObject(form) {
+    return Object.fromEntries(
+      new FormData(form).entries()
+    );
+  }
+
+  const cdekForm =
+    document.getElementById("cdekForm");
+
+  const postForm =
+    document.getElementById("postForm");
+
+  fillForm(
+    cdekForm,
+    state.delivery.cdek
+  );
+
+  fillForm(
+    postForm,
+    state.delivery.russian_post
+  );
+
+  cdekForm.addEventListener(
+    "submit",
+    event => {
+      event.preventDefault();
+
+      state.delivery.cdek = {
+        ...state.delivery.cdek,
+        ...formToObject(cdekForm),
+        mode: state.delivery.cdek.mode
+      };
+
+      const status =
+        document.getElementById("cdekStatus");
+
+      status.textContent =
+        "Данные подготовлены к сохранению.";
+
+      setTimeout(() => {
+        status.textContent = "";
+      }, 2200);
+    }
+  );
+
+  postForm.addEventListener(
+    "submit",
+    event => {
+      event.preventDefault();
+
+      state.delivery.russian_post =
+        formToObject(postForm);
+
+      const status =
+        document.getElementById("postStatus");
+
+      status.textContent =
+        "Данные подготовлены к сохранению.";
+
+      setTimeout(() => {
+        status.textContent = "";
+      }, 2200);
+    }
+  );
+
+  /*
+   * ==========================================================
+   * PURCHASES
+   * ==========================================================
+   */
+
+  function renderPurchases() {
+    const container =
+      document.getElementById("purchaseList");
+
+    if (!state.purchases.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div>
+            <div class="empty-state__icon">◇</div>
+
+            <h3>
+              Покупок пока нет
+            </h3>
+
+            <p>
+              После оформления заказа здесь появятся
+              дата покупки, статус, стоимость и состав заказа.
+            </p>
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML =
+      state.purchases.map(item => `
+        <article class="history-item">
+
+          <div class="history-thumb">
+            ${
+              item.image
+                ? `<img
+                    src="${escapeHtml(item.image)}"
+                    alt="${escapeHtml(item.name)}"
+                  >`
+                : "☾"
+            }
+          </div>
+
+          <div>
+            <div class="history-name">
+              ${escapeHtml(item.name)}
+            </div>
+
+            <div class="history-meta">
+              Заказ №${escapeHtml(item.orderNumber ?? "—")}
+              · ${escapeHtml(formatDate(item.date))}
+            </div>
+
+            ${
+              item.url
+                ? `<a
+                    class="history-link"
+                    href="${escapeHtml(item.url)}"
+                  >
+                    Открыть заказ
+                  </a>`
+                : ""
+            }
+          </div>
+
+          <div class="history-side">
+
+            <div class="history-price">
+              ${formatPrice(item.price)}
+            </div>
+
+            <div class="history-status">
+              ${escapeHtml(item.status ?? "")}
+            </div>
+
+          </div>
+
+        </article>
+      `).join("");
+  }
+
+  /*
+   * ==========================================================
+   * VIEWS
+   * ==========================================================
+   */
+
+  function renderViews() {
+    const container =
+      document.getElementById("viewList");
+
+    if (!state.views.length) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+
+          <div>
+
+            <div class="empty-state__icon">
+              ◉
+            </div>
+
+            <h3>
+              История просмотров пуста
+            </h3>
+
+            <p>
+              Просмотренные колоды появятся здесь,
+              чтобы к ним можно было быстро вернуться.
+            </p>
+
+          </div>
+
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML =
+      state.views.map(item => `
+        <a
+          class="view-item"
+          href="${escapeHtml(item.url ?? "#")}"
+        >
+
+          <div class="view-image">
+            ${
+              item.image
+                ? `<img
+                    src="${escapeHtml(item.image)}"
+                    alt="${escapeHtml(item.name)}"
+                  >`
+                : "✦"
+            }
+          </div>
+
+          <div class="view-body">
+
+            <div class="view-name">
+              ${escapeHtml(item.name)}
+            </div>
+
+            <div class="view-date">
+              Просмотрено:
+              ${escapeHtml(formatDate(item.viewedAt))}
+            </div>
+
+            <div class="view-price">
+              ${formatPrice(item.price)}
+            </div>
+
+          </div>
+
+        </a>
+      `).join("");
+  }
+
+  /*
+   * ==========================================================
+   * AVATAR PREVIEW
+   * ==========================================================
+   */
+
+  const avatarInput =
+    document.getElementById("avatarInput");
+
+  document
+    .getElementById("avatarButton")
+    .addEventListener(
+      "click",
+      () => avatarInput.click()
+    );
+
+  avatarInput.addEventListener(
+    "change",
+    () => {
+      const file =
+        avatarInput.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      const reader =
+        new FileReader();
+
+      reader.addEventListener(
+        "load",
+        () => {
+          state.user.photo =
+            String(reader.result);
+
+          renderUser();
+        }
+      );
+
+      reader.readAsDataURL(file);
+    }
+  );
+
+  /*
+   * ==========================================================
+   * MOBILE MENU
+   * ==========================================================
+   */
+
+  const mobileMenu =
+    document.getElementById("mobileMenu");
+
+  function openMenu() {
+    mobileMenu.classList.add("open");
+
+    mobileMenu.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove("open");
+
+    mobileMenu.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
+
+  document
+    .getElementById("openMenu")
+    .addEventListener(
+      "click",
+      openMenu
+    );
+
+  document
+    .getElementById("closeMenu")
+    .addEventListener(
+      "click",
+      closeMenu
+    );
+
+  mobileMenu
+    .querySelectorAll("a")
+    .forEach(link => {
+      link.addEventListener(
+        "click",
+        closeMenu
+      );
+    });
+
+  /*
+   * ==========================================================
+   * PUBLIC FRONTEND API
+   * ==========================================================
+   *
+   * Позже Django/JS может передать сюда реальные данные:
+   *
+   * SelenaProfile.setUser(...)
+   * SelenaProfile.setDelivery(...)
+   * SelenaProfile.setPurchases(...)
+   * SelenaProfile.setViews(...)
+   */
+
+  window.SelenaProfile = {
+
+    setUser(user) {
+      state.user = {
+        ...state.user,
+        ...(user ?? {})
+      };
+
+      renderUser();
+    },
+
+    setDelivery(data) {
+      state.delivery = {
+        cdek: {
+          ...state.delivery.cdek,
+          ...(data?.cdek ?? {})
+        },
+
+        russian_post: {
+          ...state.delivery.russian_post,
+          ...(data?.russian_post ?? {})
+        }
+      };
+
+      fillForm(
+        cdekForm,
+        state.delivery.cdek
+      );
+
+      fillForm(
+        postForm,
+        state.delivery.russian_post
+      );
+
+      renderCdekMode();
+    },
+
+    setPurchases(items) {
+      state.purchases =
+        Array.isArray(items)
+          ? items
+          : [];
+
+      renderPurchases();
+    },
+
+    setViews(items) {
+      state.views =
+        Array.isArray(items)
+          ? items
+          : [];
+
+      renderViews();
+    },
+
+    getState() {
+      return {
+        user: {...state.user},
+
+        delivery: {
+          cdek: {...state.delivery.cdek},
+          russian_post: {
+            ...state.delivery.russian_post
+          }
+        },
+
+        purchases: [...state.purchases],
+        views: [...state.views]
+      };
+    }
+  };
+
+  /*
+   * ==========================================================
+   * INIT
+   * ==========================================================
+   */
+
+  renderUser();
+  renderCdekMode();
+  renderPurchases();
+  renderViews();
+})();
+</script>
+
+</body>
+</html>

@@ -22,10 +22,12 @@ from django.urls import path
 
 
 from pages.views import main_page
+from profile_.views import profile_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_page),
+    path('profile/', profile_page),
     path('user/', include('identity.urls')),
 
     # Swagger UI endpoints
