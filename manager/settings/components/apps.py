@@ -15,4 +15,5 @@ INSTALLED_APPS: Final[list[str]] = [
     # CUSTOM
     'identity',
     'pages',
+    'profile_'
 ]
