@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from django.db.models import Model, IntegerField, CharField
+from django.db.models import Model, BigAutoField, CharField
 
 
 
 class ProductCatalog(Model):
-    id: IntegerField[int, int] = IntegerField(
-        verbose_name="Уникальный номер каталога",
+    id = BigAutoField(
         primary_key=True,
-        auto_created=True
+        verbose_name="Уникальный номер каталога",
     )
 
     name: CharField[str, str] = CharField(

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090e1e">
+  <meta name="description" content="Авторские колоды Таро Selena Znaju — каталог.">
+  <title>Каталог — Selena Znaju</title>
+  <link rel="stylesheet" href="css/site.css">
+  <script defer src="js/demo-data.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/common.js"></script>
+  <script defer src="js/catalog.js"></script>
+</head>
+<body>
+  <div class="sky" aria-hidden="true"></div>
+  <div class="topline"><span class="topline__star">✦</span> Авторские колоды Таро, созданные с вниманием к деталям <span class="topline__star">✦</span></div>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="/" aria-label="Selena Znaju — главная">
+        <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="20" stroke="currentColor" stroke-opacity=".75"/><path d="M23 7v32M7 23h32M12 12l22 22M34 12 12 34" stroke="currentColor" stroke-opacity=".28"/><path d="M23 12l3.3 7.7L34 23l-7.7 3.3L23 34l-3.3-7.7L12 23l7.7-3.3L23 12Z" fill="currentColor"/></svg></span>
+        <span class="brand__type"><span>SELENA ZNAJU</span><small>АВТОРСКИЕ КАРТЫ ТАРО</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Основная навигация">
+        <a href="/">Главная</a>
+        <a href="catalog.html" aria-current="page">Каталог</a>
+        <a href="/#about">Об авторе</a>
+        <a href="/#delivery">Доставка</a>
+      </nav>
+      <div class="header-actions">
+        <a class="icon-link" href="/profile/" title="Профиль" aria-label="Профиль">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3.1-6.2 7-6.2s7 2.2 7 6.2"/></svg>
+        </a>
+        <a class="icon-link icon-link--basket" href="#" data-open-cart aria-label="Корзина">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h2l2.1 10.5h11.5l2-8H6"/><circle cx="9" cy="19" r="1"/><circle cx="18" cy="19" r="1"/></svg><span class="cart-count" data-cart-count hidden>0</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-toggle><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="catalog-intro shell" aria-labelledby="catalog-title">
+      <div class="breadcrumbs"><a href="/">Главная</a><span aria-hidden="true">/</span><span>Каталог</span></div>
+      <div class="catalog-intro__inner">
+        <div class="intro-copy">
+          <span class="eyebrow"><span class="eyebrow__line"></span> СОЗДАНО С ДУШОЙ</span>
+          <h1 id="catalog-title">Магия в каждой <em>детали</em></h1>
+          <p>Авторские колоды и особенные вещи, в которых встречаются символы, вдохновение и тихая красота.</p>
+          <div class="intro-note"><span class="mini-spark">✧</span> Каждая вещь — маленькая история</div>
+        </div>
+        <div class="intro-orbit" aria-hidden="true">
+          <div class="intro-orbit__ring intro-orbit__ring--outer"></div><div class="intro-orbit__ring intro-orbit__ring--inner"></div>
+          <span class="intro-orbit__star intro-orbit__star--one">✦</span><span class="intro-orbit__star intro-orbit__star--two">✧</span>
+          <div class="intro-orbit__moon"></div><span class="intro-orbit__caption">THE MAGIC WITHIN</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog-section shell" aria-label="Товары каталога">
+      <div class="catalog-toolbar">
+        <div class="catalog-toolbar__left">
+          <span class="overline">КОЛЛЕКЦИЯ</span>
+          <h2>Найдите своё <em>вдохновение</em></h2>
+          <p class="result-count" id="result-count" aria-live="polite">5 изделий в коллекции</p>
+        </div>
+        <div class="catalog-controls">
+          <label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 4.5 4.5"/></svg><input id="catalog-search" type="search" placeholder="Поиск по каталогу" aria-label="Поиск товаров"></label>
+          <label class="sort-field"><span class="visually-hidden">Сортировка</span><select id="catalog-sort"><option value="default">По умолчанию</option><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="title">По названию</option></select><span aria-hidden="true">⌄</span></label>
+        </div>
+      </div>
+      <div class="filter-row" role="group" aria-label="Категории товаров">
+        <button type="button" class="filter-chip is-active" data-category="all" aria-pressed="true">Все товары</button>
+        <button type="button" class="filter-chip" data-category="decks" aria-pressed="false">Колоды Таро</button>
+        <button type="button" class="filter-chip" data-category="accessories" aria-pressed="false">Аксессуары</button>
+        <button type="button" class="filter-chip" data-category="art" aria-pressed="false">Авторские работы</button>
+      </div>
+      <div class="api-status" id="api-status" role="status" hidden></div>
+
+      <!-- ДЕМО-КАРТОЧКИ / ПУСТЫШКИ. JS заменит ВСЕ эти элементы ответом API /api/catalog/products/. -->
+      <div class="products-grid" id="products-grid" aria-live="polite">
+        <!-- ПУСТЫШКА №1: пример разметки карточки товара. -->
+        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=lunnaya-koloda"><img src="assets/deck-moon.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=lunnaya-koloda">Лунная колода</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>3 900 ₽</strong><span class="stock stock--available">В наличии: 7</span></div></div><a class="product-card__link" href="product.html?slug=lunnaya-koloda">Подробнее <span aria-hidden="true">↗</span></a></article>
+        <!-- ПУСТЫШКА №2: заменяется данными бэкенда. -->
+        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=polyarnaya-zvezda"><img src="assets/deck-star.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=polyarnaya-zvezda">Полярная звезда</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>4 200 ₽</strong><span class="stock stock--available">В наличии: 4</span></div></div><a class="product-card__link" href="product.html?slug=polyarnaya-zvezda">Подробнее <span aria-hidden="true">↗</span></a></article>
+        <!-- ПУСТЫШКА №3: заменяется данными бэкенда. -->
+        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=zolotoe-solntse"><img src="assets/deck-sun.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=zolotoe-solntse">Золотое солнце</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>3 600 ₽</strong><span class="stock stock--available">В наличии: 11</span></div></div><a class="product-card__link" href="product.html?slug=zolotoe-solntse">Подробнее <span aria-hidden="true">↗</span></a></article>
+        <!-- ПУСТЫШКА №4: заменяется данными бэкенда. -->
+        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=zerkalo-nochi"><img src="assets/deck-mirror.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛЛЕКЦИЯ</span><h3><a href="product.html?slug=zerkalo-nochi">Зеркало ночи</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>4 500 ₽</strong><span class="stock stock--available">В наличии: 3</span></div></div><a class="product-card__link" href="product.html?slug=zerkalo-nochi">Подробнее <span aria-hidden="true">↗</span></a></article>
+        <!-- ПУСТЫШКА №5: заменяется данными бэкенда. -->
+        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=taynyy-sad"><img src="assets/deck-garden.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">АВТОРСКИЕ РАБОТЫ</span><h3><a href="product.html?slug=taynyy-sad">Тайный сад</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>2 800 ₽</strong><span class="stock stock--available">В наличии: 5</span></div></div><a class="product-card__link" href="product.html?slug=taynyy-sad">Подробнее <span aria-hidden="true">↗</span></a></article>
+      </div>
+      <div class="empty-state" id="empty-state" hidden><span aria-hidden="true">☾</span><h3>Пока ничего не найдено</h3><p>Попробуйте изменить запрос или выбрать другую категорию.</p><button class="button button--outline" id="reset-filters" type="button">Показать все товары</button></div>
+    </section>
+
+    <section class="catalog-bottom shell"><div class="catalog-bottom__icon">✧</div><div><strong>Вещи, которым хочется доверить свою историю</strong><p>Откройте понравившуюся карточку, чтобы рассмотреть изображения и подробности.</p></div><a href="/#delivery" class="text-link">О доставке <span aria-hidden="true">↗</span></a></section>
+  </main>
+  <footer class="site-footer"><div class="shell footer-inner"><span class="footer-brand">SELENA ZNAJU <span>✦</span></span><span>Авторские карты Таро · Создано с любовью</span><a href="catalog.html">Вернуться к каталогу ↑</a></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
