@@ -1,13 +1,30 @@
 from __future__ import annotations
 
-from django.db.models import Model, ImageField, ForeignKey, BooleanField, CASCADE
+from pathlib import Path
+from uuid import uuid4
+
+from django.db.models import (
+    Model,
+    ImageField,
+    ForeignKey,
+    BooleanField,
+    CASCADE,
+    UniqueConstraint,
+    Q
+)
 
 from .card import ProductCard
 
 
+def product_image_path(instance, filename):
+    extension = Path(filename).suffix.lower()
+
+    return (
+        f"products/{instance.product_id}/"
+        f"{uuid4().hex}{extension}"
+    )
+
 class ProductImage(Model):
-    def get_path(self) -> str:
-        return f'products/{self.product.uuid}/'
 
     product = ForeignKey(
         ProductCard,
@@ -15,7 +32,12 @@ class ProductImage(Model):
         related_name='images'
     )
 
-    img = ImageField(upload_to=get_path, verbose_name="Изображение")
+    img = ImageField(
+        upload_to=product_image_path,
+        verbose_name="Изображение",
+        max_length=255
+    )
+
     is_primary = BooleanField(
         verbose_name="Главное фото",
         default=False
@@ -27,3 +49,10 @@ class ProductImage(Model):
 
     class Meta:
         db_table = '"product"."images"'
+        constraints = [
+            UniqueConstraint(
+                fields=["product"],
+                condition=Q(is_primary=True),
+                name="unique_primary_image_per_product",
+            )
+        ]

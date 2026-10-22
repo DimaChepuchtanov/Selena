@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
@@ -8,12 +9,21 @@ from django.db.models import (
     UUIDField,
     CharField,
     TextField,
-    PositiveIntegerField
+    PositiveIntegerField,
+    DateTimeField,
+    BooleanField,
+    CheckConstraint,
+    Q,
+    ForeignKey,
+    CASCADE
 )
+
+from .catalog import ProductCatalog
 
 
 if TYPE_CHECKING:
     from uuid import UUID
+    from datetime import datetime
 
 
 class ProductCard(Model):
@@ -44,12 +54,32 @@ class ProductCard(Model):
         default=0
     )
 
+    is_published = BooleanField(
+        default=False,
+        verbose_name="Опубликован",
+    )
+
+    created_at: DateTimeField[datetime, datetime] = DateTimeField(
+        verbose_name="Дата создания товара",
+        auto_now_add=True
+    )
+
+    catalog = ForeignKey(
+        ProductCatalog,
+        on_delete=CASCADE
+    )
+
 
     def __str__(self):
         return self.name
 
-
     class Meta:
         db_table = '"product"."card"'
+        constraints = [
+            CheckConstraint(
+                condition=Q(price__gte=Decimal("0")),
+                name="product_price_non_negative",
+            ),
+        ]
 
 
