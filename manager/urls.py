@@ -23,8 +23,9 @@ from django.urls import path
 
 from pages.views import main_page
 from profile_.views import profile_page
+from catalog.urls import urls
 
-urlpatterns = [
+urlpatterns = urls + [
     path('admin/', admin.site.urls),
     path('', main_page),
     path('profile/', profile_page),

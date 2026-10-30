@@ -6,6 +6,7 @@ services:
       POSTGRES_DB: ${PG_DATABASE:-selena}
       POSTGRES_USER: ${PG_USER:-selena}
       POSTGRES_PASSWORD: ${PG_PASSWORD:-change-me}
+      POSTGRES_PORT: 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

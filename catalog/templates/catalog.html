@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="ru">
 <head>
@@ -6,15 +7,14 @@
   <meta name="theme-color" content="#090e1e">
   <meta name="description" content="Авторские колоды Таро Selena Znaju — каталог.">
   <title>Каталог — Selena Znaju</title>
-  <link rel="stylesheet" href="css/site.css">
-  <script defer src="js/demo-data.js"></script>
-  <script defer src="js/api.js"></script>
-  <script defer src="js/common.js"></script>
-  <script defer src="js/catalog.js"></script>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <script defersrc="{% static 'js/demo-data.js' %}"></script>
+  <script defer src="{% static 'js/api.js' %}"></script>
+  <script defer src="{% static 'js/common.js' %}"></script>
+  <script defer src="{% static 'js/catalog.js' %}"></script>
 </head>
 <body>
   <div class="sky" aria-hidden="true"></div>
-  <div class="topline"><span class="topline__star">✦</span> Авторские колоды Таро, созданные с вниманием к деталям <span class="topline__star">✦</span></div>
   <header class="site-header">
     <div class="shell header-inner">
       <a class="brand" href="/" aria-label="Selena Znaju — главная">
@@ -62,7 +62,6 @@
         <div class="catalog-toolbar__left">
           <span class="overline">КОЛЛЕКЦИЯ</span>
           <h2>Найдите своё <em>вдохновение</em></h2>
-          <p class="result-count" id="result-count" aria-live="polite">5 изделий в коллекции</p>
         </div>
         <div class="catalog-controls">
           <label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 4.5 4.5"/></svg><input id="catalog-search" type="search" placeholder="Поиск по каталогу" aria-label="Поиск товаров"></label>
@@ -77,19 +76,6 @@
       </div>
       <div class="api-status" id="api-status" role="status" hidden></div>
 
-      <!-- ДЕМО-КАРТОЧКИ / ПУСТЫШКИ. JS заменит ВСЕ эти элементы ответом API /api/catalog/products/. -->
-      <div class="products-grid" id="products-grid" aria-live="polite">
-        <!-- ПУСТЫШКА №1: пример разметки карточки товара. -->
-        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=lunnaya-koloda"><img src="assets/deck-moon.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=lunnaya-koloda">Лунная колода</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>3 900 ₽</strong><span class="stock stock--available">В наличии: 7</span></div></div><a class="product-card__link" href="product.html?slug=lunnaya-koloda">Подробнее <span aria-hidden="true">↗</span></a></article>
-        <!-- ПУСТЫШКА №2: заменяется данными бэкенда. -->
-        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=polyarnaya-zvezda"><img src="assets/deck-star.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=polyarnaya-zvezda">Полярная звезда</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>4 200 ₽</strong><span class="stock stock--available">В наличии: 4</span></div></div><a class="product-card__link" href="product.html?slug=polyarnaya-zvezda">Подробнее <span aria-hidden="true">↗</span></a></article>
-        <!-- ПУСТЫШКА №3: заменяется данными бэкенда. -->
-        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=zolotoe-solntse"><img src="assets/deck-sun.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛОДЫ ТАРО</span><h3><a href="product.html?slug=zolotoe-solntse">Золотое солнце</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>3 600 ₽</strong><span class="stock stock--available">В наличии: 11</span></div></div><a class="product-card__link" href="product.html?slug=zolotoe-solntse">Подробнее <span aria-hidden="true">↗</span></a></article>
-        <!-- ПУСТЫШКА №4: заменяется данными бэкенда. -->
-        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=zerkalo-nochi"><img src="assets/deck-mirror.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">КОЛЛЕКЦИЯ</span><h3><a href="product.html?slug=zerkalo-nochi">Зеркало ночи</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>4 500 ₽</strong><span class="stock stock--available">В наличии: 3</span></div></div><a class="product-card__link" href="product.html?slug=zerkalo-nochi">Подробнее <span aria-hidden="true">↗</span></a></article>
-        <!-- ПУСТЫШКА №5: заменяется данными бэкенда. -->
-        <article class="product-card" data-placeholder="true"><a class="product-card__image" href="product.html?slug=taynyy-sad"><img src="assets/deck-garden.svg" alt="Демонстрационная иллюстрация колоды"/><span class="product-card__badge">ДЕМО</span></a><div class="product-card__body"><span class="product-card__category">АВТОРСКИЕ РАБОТЫ</span><h3><a href="product.html?slug=taynyy-sad">Тайный сад</a></h3><p class="product-card__desc">Демонстрационное описание товара.</p><div class="product-card__bottom"><strong>2 800 ₽</strong><span class="stock stock--available">В наличии: 5</span></div></div><a class="product-card__link" href="product.html?slug=taynyy-sad">Подробнее <span aria-hidden="true">↗</span></a></article>
-      </div>
       <div class="empty-state" id="empty-state" hidden><span aria-hidden="true">☾</span><h3>Пока ничего не найдено</h3><p>Попробуйте изменить запрос или выбрать другую категорию.</p><button class="button button--outline" id="reset-filters" type="button">Показать все товары</button></div>
     </section>
 

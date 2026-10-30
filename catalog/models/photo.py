@@ -16,15 +16,16 @@ from django.db.models import (
 from .card import ProductCard
 
 
-def product_image_path(instance, filename):
-    extension = Path(filename).suffix.lower()
-
-    return (
-        f"products/{instance.product_id}/"
-        f"{uuid4().hex}{extension}"
-    )
 
 class ProductImage(Model):
+
+    def product_image_path(self, instance, filename):
+        extension = Path(filename).suffix.lower()
+
+        return (
+            f"products/{instance.product_id}/"
+            f"{uuid4().hex}{extension}"
+    )
 
     product = ForeignKey(
         ProductCard,
