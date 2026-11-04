@@ -6,7 +6,18 @@ from rest_framework.views import APIView
 
 from identity.forms import RegisterForm, LoginForm
 
-# Create your views here.
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
+from django.views.decorators.http import require_GET
+
+
+@require_GET
+def csrf_view(request):
+    return JsonResponse({
+        "csrfToken": get_token(request)
+    })
+
+
 class IdentityUser(APIView):
     def get(self, request, *args, **kwargs):
         form = RegisterForm()

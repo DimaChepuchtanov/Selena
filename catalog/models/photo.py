@@ -19,7 +19,7 @@ from .card import ProductCard
 
 class ProductImage(Model):
 
-    def product_image_path(self, instance, filename):
+    def product_image_path(instance, filename):
         extension = Path(filename).suffix.lower()
 
         return (

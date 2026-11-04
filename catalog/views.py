@@ -17,11 +17,23 @@ class CatalogView(ViewSet):
         return Response(data=[(cat.id, cat.name) for cat in catalog])
 
     def get_current_catalog(self, request, catalog_id):
-        current_catalog = ProductCard.objects.filter(catalog=catalog_id, is_published=True)
-        return Response(data=[
-            (card.id, card.title, card.price, card.stock)
-            for card
-            in current_catalog
-        ]
+        current_catalog = ProductCard.objects.filter(
+            catalog_id=catalog_id,
+            is_published=True
         )
+
+        result = []
+
+        for card in current_catalog:
+            main_image = card.images.filter(is_primary=True).first()
+
+            result.append({
+                "uuid": card.uuid,
+                "name": card.name,
+                "price": card.price,
+                "stock": card.stock,
+                "image": main_image.img.url if main_image else None
+            })
+
+        return Response(data=result)
 

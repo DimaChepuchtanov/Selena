@@ -21,13 +21,10 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from django.urls import path
 
 
-from pages.views import main_page
 from profile_.views import profile_page
 from catalog.urls import urls
 
 urlpatterns = urls + [
-    path('admin/', admin.site.urls),
-    path('', main_page),
     path('profile/', profile_page),
     path('user/', include('identity.urls')),
 
@@ -36,3 +33,16 @@ urlpatterns = urls + [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 
 ]
+
+
+# Selena Znaju React management API
+from catalog.public_detail_api import PublicProductDetail
+urlpatterns += [
+    path('api/manage/', include('catalog.admin_urls')),
+    path('api/catalog/products/<uuid:product_id>/', PublicProductDetail.as_view(), name='public-product-detail'),
+]
+
+from django.conf import settings
+from django.conf.urls.static import static
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
