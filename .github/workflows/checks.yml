@@ -2,9 +2,9 @@ name: Selena checks
 
 on:
   push:
-    branches: [create-catalog]
+    branches: [create-catalog, dev]
   pull_request:
-    branches: [create-catalog, main]
+    branches: [create-catalog, dev, main]
 
 jobs:
   backend:
