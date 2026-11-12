@@ -16,6 +16,26 @@ class AuthenticationTests(TestCase):
             password="SafePassword-2026!",
         )
 
+    def test_seeded_test_accounts_are_present_with_correct_roles_and_passwords(self):
+        import os
+
+        admin = get_user_model().objects.get(login="root@mail.ru")
+        customer = get_user_model().objects.get(login="user@mail.ru")
+        self.assertEqual(admin.role.role, Role.RoleChoices.ADMIN)
+        self.assertEqual(customer.role.role, Role.RoleChoices.USER)
+
+        self.assertTrue(admin.check_password(
+            os.environ.get("SELENA_TEST_ADMIN_PASSWORD", "SelenaAdmin-2026!")
+        ))
+        self.assertTrue(customer.check_password(
+            os.environ.get("SELENA_TEST_USER_PASSWORD", "SelenaUser-2026!")
+        ))
+
+        self.client.force_login(admin)
+        self.assertEqual(self.client.get("/api/manage/me/").status_code, 200)
+        self.client.force_login(customer)
+        self.assertEqual(self.client.get("/api/manage/me/").status_code, 403)
+
     def test_csrf_endpoint_sets_cookie(self):
         response = self.client.get("/user/csrf/")
         self.assertEqual(response.status_code, 200)
