@@ -32,6 +32,7 @@ class CatalogView(ViewSet):
             {
                 "uuid": card.uuid,
                 "name": card.name,
+                "description": card.describe,
                 "price": card.price,
                 "stock": card.stock,
                 "image": (
