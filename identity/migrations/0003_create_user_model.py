@@ -11,6 +11,12 @@ class Migration(migrations.Migration):
         ("identity", "0002_create_role_data"),
     ]
 
+    # Django Admin uses AUTH_USER_MODEL, but User is created in this migration.
+    # Make sure it exists before admin.0001_initial on a fresh database.
+    run_before = [
+        ("admin", "0001_initial"),
+    ]
+
     operations = [
         migrations.CreateModel(
             name="User",
