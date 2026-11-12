@@ -24,11 +24,17 @@ export function csrfToken() {
 }
 
 export async function ensureCsrfToken() {
-  if (csrfToken()) return csrfToken();
-  // Existing Django login page renders {% csrf_token %} and sets csrftoken cookie.
-  const response = await fetch('/user/auth/', { credentials: 'same-origin' });
-  if (!response.ok) throw new ApiError('Не удалось получить CSRF cookie', response.status);
-  return csrfToken();
+    const response = await fetch('/user/csrf/', {
+        credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+        throw new Error('Не удалось получить CSRF');
+    }
+
+    const data = await response.json();
+
+    return data.csrfToken;
 }
 
 export async function postDjangoForm(path, fields) {

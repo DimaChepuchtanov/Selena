@@ -1,9 +1,11 @@
+from django.db.models import Prefetch
 from django.views import View
 from django.shortcuts import render
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 
-from .models import ProductCatalog, ProductCard
+
+from .models import ProductCatalog, ProductCard, ProductImage
 
 
 class PagesView(ViewSet):
@@ -17,9 +19,21 @@ class CatalogView(ViewSet):
         return Response(data=[(cat.id, cat.name) for cat in catalog])
 
     def get_current_catalog(self, request, catalog_id):
-        current_catalog = ProductCard.objects.filter(
-            catalog_id=catalog_id,
-            is_published=True
+        current_catalog = (
+            ProductCard.objects
+            .filter(
+                catalog_id=catalog_id,
+                is_published=True
+            )
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=ProductImage.objects.filter(
+                        is_primary=True
+                    ),
+                    to_attr="primary_images"
+                )
+            )
         )
 
         result = []
