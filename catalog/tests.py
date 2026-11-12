@@ -1,11 +1,16 @@
 """Public and management catalog API regression tests."""
 import json
+from io import BytesIO
+from tempfile import TemporaryDirectory
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 from django.db import connection
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
+
+from PIL import Image
 
 from identity.models import Role
 from .models import ProductCard, ProductCatalog, ProductImage
@@ -104,6 +109,72 @@ class CatalogApiTests(TestCase):
         self.assertEqual(
             self.client.delete(f"/api/manage/catalogs/{self.catalog.pk}/").status_code, 409
         )
+
+    def test_admin_creates_draft_then_publishes_product(self):
+        role, _ = Role.objects.get_or_create(role=Role.RoleChoices.ADMIN)
+        user = get_user_model().objects.create_user(
+            login="publisher@example.com", password="SafePassword-2026!", role=role
+        )
+        self.client.force_login(user)
+        response = self.client.post(
+            "/api/manage/products/",
+            data=json.dumps({
+                "name": "Публикуемая колода", "describe": "Описание",
+                "price": 999, "stock": 2, "catalog": self.catalog.pk,
+                "is_published": False,
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
+        product_id = response.json()["uuid"]
+        self.assertEqual(self.client.get(f"/api/catalog/products/{product_id}/").status_code, 404)
+        published = self.client.patch(
+            f"/api/manage/products/{product_id}/",
+            data=json.dumps({"is_published": True}),
+            content_type="application/json",
+        )
+        self.assertEqual(published.status_code, 200)
+        self.assertEqual(self.client.get(f"/api/catalog/products/{product_id}/").status_code, 200)
+
+    def test_admin_uploads_changes_cover_and_deletes_photo(self):
+        role, _ = Role.objects.get_or_create(role=Role.RoleChoices.ADMIN)
+        user = get_user_model().objects.create_user(
+            login="photoadmin@example.com", password="SafePassword-2026!", role=role
+        )
+        self.client.force_login(user)
+        with TemporaryDirectory() as directory:
+            with override_settings(MEDIA_ROOT=directory):
+                buffer = BytesIO()
+                Image.new("RGB", (2, 2), "white").save(buffer, format="PNG")
+                image_bytes = buffer.getvalue()
+                endpoint = f"/api/manage/products/{self.product.pk}/images/"
+                a = self.client.post(endpoint, {
+                    "image": SimpleUploadedFile("front.png", image_bytes, content_type="image/png"),
+                })
+                b = self.client.post(endpoint, {
+                    "image": SimpleUploadedFile("back.png", image_bytes, content_type="image/png"),
+                })
+                self.assertEqual(a.status_code, 201)
+                self.assertEqual(b.status_code, 201)
+                self.assertFalse(b.json()["is_primary"])  # the product already has a cover
+
+                selected = self.client.patch(
+                    f"{endpoint}{b.json()['id']}/",
+                    data=json.dumps({"is_primary": True}),
+                    content_type="application/json",
+                )
+                self.assertEqual(selected.status_code, 200)
+                self.assertTrue(selected.json()["is_primary"])
+                self.assertEqual(
+                    ProductImage.objects.filter(product=self.product, is_primary=True).count(),
+                    1,
+                )
+                removed = self.client.delete(f"{endpoint}{b.json()['id']}/")
+                self.assertEqual(removed.status_code, 204)
+                self.assertEqual(
+                    ProductImage.objects.filter(product=self.product, is_primary=True).count(),
+                    1,
+                )
 
     def test_schemas_exist_on_new_test_database(self):
         with connection.cursor() as cursor:
