@@ -1,53 +1,43 @@
+from django.conf import settings
 from django.db.models import Prefetch
-from django.views import View
-from django.shortcuts import render
-from rest_framework.viewsets import ViewSet
+from django.shortcuts import redirect
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
-
-from .models import ProductCatalog, ProductCard, ProductImage
+from .models import ProductCard, ProductCatalog, ProductImage
 
 
 class PagesView(ViewSet):
     def catalog(self, request):
-        return render(request, 'catalog.html')
+        # Legacy Django URL: the storefront has moved to React.
+        return redirect(settings.FRONTEND_ORIGIN.rstrip("/") + "/catalog")
 
 
 class CatalogView(ViewSet):
     def get_catalog(self, request):
-        catalog = ProductCatalog.objects.all()
-        return Response(data=[(cat.id, cat.name) for cat in catalog])
+        catalogs = ProductCatalog.objects.all()
+        return Response([(cat.id, cat.name) for cat in catalogs])
 
     def get_current_catalog(self, request, catalog_id):
-        current_catalog = (
+        products = (
             ProductCard.objects
-            .filter(
-                catalog_id=catalog_id,
-                is_published=True
-            )
-            .prefetch_related(
-                Prefetch(
-                    "images",
-                    queryset=ProductImage.objects.filter(
-                        is_primary=True
-                    ),
-                    to_attr="primary_images"
-                )
-            )
+            .filter(catalog_id=catalog_id, is_published=True)
+            .prefetch_related(Prefetch(
+                "images",
+                queryset=ProductImage.objects.filter(is_primary=True),
+                to_attr="primary_images",
+            ))
         )
-
-        result = []
-
-        for card in current_catalog:
-            main_image = card.images.filter(is_primary=True).first()
-
-            result.append({
+        return Response([
+            {
                 "uuid": card.uuid,
                 "name": card.name,
                 "price": card.price,
                 "stock": card.stock,
-                "image": main_image.img.url if main_image else None
-            })
-
-        return Response(data=result)
-
+                "image": (
+                    card.primary_images[0].img.url
+                    if card.primary_images and card.primary_images[0].img else None
+                ),
+            }
+            for card in products
+        ])

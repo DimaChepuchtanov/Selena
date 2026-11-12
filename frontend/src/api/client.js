@@ -18,34 +18,36 @@ export async function request(path, { method = 'GET', body, signal, headers = {}
   return response.json();
 }
 
-export function csrfToken() {
-  const pair = document.cookie.split('; ').find(s => s.startsWith('csrftoken='));
-  return pair ? decodeURIComponent(pair.split('=').slice(1).join('=')) : '';
-}
-
 export async function ensureCsrfToken() {
-    const response = await fetch('/user/csrf/', {
-        credentials: 'same-origin'
-    });
-
-    if (!response.ok) {
-        throw new Error('Не удалось получить CSRF');
-    }
-
-    const data = await response.json();
-
-    return data.csrfToken;
+  const response = await fetch('/user/csrf/', { credentials: 'same-origin' });
+  if (!response.ok) throw new ApiError('Не удалось получить CSRF-токен', response.status);
+  const data = await response.json();
+  if (!data.csrfToken) throw new ApiError('CSRF-токен отсутствует', response.status);
+  return data.csrfToken;
 }
 
 export async function postDjangoForm(path, fields) {
   const csrf = await ensureCsrfToken();
   const response = await fetch(path, {
-    method: 'POST', credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'X-CSRFToken': csrf },
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'X-CSRFToken': csrf,
+    },
     body: new URLSearchParams(fields),
   });
-  if (!response.ok) throw new ApiError(response.status === 400 ? 'Проверьте данные формы. Возможно, email уже используется или пароль неверен.' : `Ошибка сервера (${response.status})`, response.status);
-  // Backend success redirects to /profile/; follow-up route is then served by Vite.
-  if (!response.redirected) throw new ApiError('Сервер не подтвердил вход. Проверьте ответ Django.', response.status);
-  return true;
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.ok) {
+    const messages = Object.values(data?.errors || {})
+      .flatMap(items => items.map(item => item.message || String(item)));
+    throw new ApiError(messages.join(' ') || `Ошибка авторизации (${response.status})`, response.status);
+  }
+  return data;
+}
+
+export async function logoutUser() {
+  const csrf = await ensureCsrfToken();
+  return request('/user/logout/', { method: 'POST', headers: { 'X-CSRFToken': csrf } });
 }
