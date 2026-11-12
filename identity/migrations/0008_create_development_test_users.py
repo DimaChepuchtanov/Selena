@@ -15,7 +15,9 @@ USER_EMAIL = "user@mail.ru"
 
 
 def create_development_users(apps, schema_editor):
-    if not settings.DEBUG:
+    # Django's test runner temporarily sets DEBUG=False, even for dev settings.
+    # Gate by settings module so clean test databases get the same seed data.
+    if not settings.SETTINGS_MODULE.endswith('.dev'):
         return
 
     Role = apps.get_model("identity", "Role")
