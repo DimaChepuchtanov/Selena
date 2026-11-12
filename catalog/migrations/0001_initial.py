@@ -15,6 +15,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(
+            sql="CREATE SCHEMA IF NOT EXISTS product",
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.CreateModel(
             name='ProductCatalog',
             fields=[
