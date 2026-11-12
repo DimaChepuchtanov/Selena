@@ -5,6 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { SiteHeader } from '../components/SiteHeader';
 import { SiteFooter } from '../components/SiteFooter';
 import { CATEGORY_NAMES, itemCount } from '../utils/format';
+import { filterAndSortProducts } from '../utils/catalogFilters';
 
 const categories = Object.entries(CATEGORY_NAMES);
 export function CatalogPage() {
@@ -13,14 +14,10 @@ export function CatalogPage() {
   const [search, setSearch] = useState(params.get('search') || '');
   const [sort, setSort] = useState('default');
   const { items, pending, error } = useProducts(selected);
-  const displayed = useMemo(() => {
-    const q = search.trim().toLocaleLowerCase('ru');
-    const result = items.filter(item => !q || `${item.name} ${item.description}`.toLocaleLowerCase('ru').includes(q));
-    if (sort === 'price-asc') result.sort((a,b) => a.price-b.price);
-    if (sort === 'price-desc') result.sort((a,b) => b.price-a.price);
-    if (sort === 'title') result.sort((a,b) => a.name.localeCompare(b.name,'ru'));
-    return result;
-  }, [items, search, sort]);
+  const displayed = useMemo(
+    () => filterAndSortProducts(items, search, sort),
+    [items, search, sort]
+  );
   const select = key => setParams(key === 'all' ? {} : {category:key});
   return <div className="catalog-theme"><div className="sky" aria-hidden="true"/><SiteHeader catalogStyle/>
     <main>
