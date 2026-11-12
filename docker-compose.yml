@@ -6,7 +6,6 @@ services:
       POSTGRES_DB: ${PG_DATABASE:-selena}
       POSTGRES_USER: ${PG_USER:-selena}
       POSTGRES_PASSWORD: ${PG_PASSWORD:-change-me}
-      POSTGRES_PORT: 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init/001_create_schemas.sql:/docker-entrypoint-initdb.d/001_create_schemas.sql:ro
@@ -17,15 +16,19 @@ services:
       retries: 10
 
   db-init:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
     restart: "no"
     environment:
       DJANGO_SETTINGS_MODULE: manager.settings.dev
       PG_HOST: db
-      PG_PORT: 5432
+      PG_PORT: "5432"
       PG_DATABASE: ${PG_DATABASE:-selena}
       PG_USER: ${PG_USER:-selena}
       PG_PASSWORD: ${PG_PASSWORD:-change-me}
+      SECRET_KEY: ${SECRET_KEY:?Add SECRET_KEY to .env}
     depends_on:
       db:
         condition: service_healthy
@@ -39,16 +42,19 @@ services:
         python manage.py migrate --noinput
 
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
     restart: unless-stopped
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
     environment:
       DJANGO_SETTINGS_MODULE: manager.settings.dev
       PG_HOST: db
-      PG_PORT: 5432
+      PG_PORT: "5432"
       PG_DATABASE: ${PG_DATABASE:-selena}
       PG_USER: ${PG_USER:-selena}
       PG_PASSWORD: ${PG_PASSWORD:-change-me}
+      SECRET_KEY: ${SECRET_KEY:?Add SECRET_KEY to .env}
     ports:
       - "${APP_PORT:-8000}:8000"
     depends_on:
@@ -56,6 +62,35 @@ services:
         condition: service_completed_successfully
     volumes:
       - .:/app
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/catalog/', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    restart: unless-stopped
+    environment:
+      DJANGO_ORIGIN: http://web:8000
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend_node_modules:/app/frontend/node_modules
 
 volumes:
   postgres_data:
+  frontend_node_modules:
