@@ -9,6 +9,7 @@ services:
       POSTGRES_PORT: 5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init/001_create_schemas.sql:/docker-entrypoint-initdb.d/001_create_schemas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
@@ -34,7 +35,7 @@ services:
       - sh
       - -ec
       - |
-        python manage.py shell -c "from django.db import connection; cursor = connection.cursor(); cursor.execute('CREATE SCHEMA IF NOT EXISTS identity'); cursor.execute('CREATE SCHEMA IF NOT EXISTS product'); cursor.close()"
+        python manage.py shell -c "from pathlib import Path; from django.db import connection; sql = Path('db/init/001_create_schemas.sql').read_text(encoding='utf-8'); connection.cursor().execute(sql)"
         python manage.py migrate --noinput
 
   web:
