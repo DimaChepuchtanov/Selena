@@ -77,7 +77,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          curl --fail --retry 20 --retry-delay 3 --retry-connrefused http://localhost:5173/ -o /tmp/selena-index.html
+          curl --fail --retry 20 --retry-delay 2 --retry-all-errors http://localhost:5173/ -o /tmp/selena-index.html
           grep -q '<div id="root"></div>' /tmp/selena-index.html
           for path in /auth /reg /catalog /profile /manage /static/img/arcana.svg /api/catalog/; do
             curl -fsS "http://localhost:5173${path}" -o /dev/null
@@ -91,6 +91,7 @@ jobs:
             --data-urlencode 'agreement=on' \
             http://localhost:5173/user/reg/ -o /tmp/selena-registration.json
           python3 -c 'import json; assert json.load(open("/tmp/selena-registration.json"))["ok"]'
+          csrf=$(curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies http://localhost:5173/user/csrf/ | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])')
           curl -fsS -b /tmp/selena-cookies http://localhost:5173/api/me/ -o /tmp/selena-me.json
           python3 -c 'import json; assert json.load(open("/tmp/selena-me.json"))["email"] == "smoke@example.com"'
           status=$(curl -sS -o /dev/null -w '%{http_code}' -b /tmp/selena-cookies http://localhost:5173/api/manage/me/)
@@ -99,6 +100,7 @@ jobs:
             -H "Accept: application/json" -H "X-CSRFToken: ${csrf}" \
             -X POST http://localhost:5173/user/logout/ -o /tmp/selena-logout.json
           python3 -c 'import json; assert json.load(open("/tmp/selena-logout.json"))["ok"]'
+          csrf=$(curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies http://localhost:5173/user/csrf/ | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])')
           curl -fsS -b /tmp/selena-cookies -c /tmp/selena-cookies \
             -H "Accept: application/json" -H "X-CSRFToken: ${csrf}" \
             --data-urlencode 'email=smoke@example.com' \
