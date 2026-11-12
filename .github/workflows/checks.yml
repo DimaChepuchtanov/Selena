@@ -1,0 +1,119 @@
+name: Selena checks
+
+on:
+  push:
+    branches: [create-catalog, dev]
+  pull_request:
+    branches: [create-catalog, dev, main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: selena
+          POSTGRES_USER: selena
+          POSTGRES_PASSWORD: test-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U selena -d selena"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DJANGO_SETTINGS_MODULE: manager.settings.dev
+      SECRET_KEY: django-integration-test-key-not-for-production
+      PG_HOST: localhost
+      PG_PORT: "5432"
+      PG_DATABASE: selena
+      PG_USER: selena
+      PG_PASSWORD: test-password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python manage.py check
+      - run: python manage.py makemigrations --check --dry-run
+      - run: python manage.py test --verbosity 2
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    env:
+      PG_USER: selena
+      PG_PASSWORD: integration-test-only
+      PG_DATABASE: selena
+      SECRET_KEY: integration-test-django-key
+      FRONTEND_PORT: "5173"
+      APP_PORT: "8000"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose configuration
+        run: docker compose config --quiet
+      - name: Build and start database, migrations, backend and frontend
+        run: docker compose up -d --build
+      - name: Smoke test API, frontend routes, CSRF and session authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --retry 20 --retry-delay 2 --retry-all-errors http://localhost:5173/ -o /tmp/selena-index.html
+          grep -q '<div id="root"></div>' /tmp/selena-index.html
+          for path in /auth /reg /catalog /profile /manage /static/img/arcana.svg /api/catalog/; do
+            curl -fsS "http://localhost:5173${path}" -o /dev/null
+          done
+          csrf=$(curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies http://localhost:5173/user/csrf/ | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])')
+          curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies \
+            -H "Accept: application/json" -H "X-CSRFToken: ${csrf}" \
+            --data-urlencode 'email=smoke@example.com' \
+            --data-urlencode 'password=TestPassword-2026!' \
+            --data-urlencode 'password_confirm=TestPassword-2026!' \
+            --data-urlencode 'agreement=on' \
+            http://localhost:5173/user/reg/ -o /tmp/selena-registration.json
+          python3 -c 'import json; assert json.load(open("/tmp/selena-registration.json"))["ok"]'
+          csrf=$(curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies http://localhost:5173/user/csrf/ | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])')
+          curl -fsS -b /tmp/selena-cookies http://localhost:5173/api/me/ -o /tmp/selena-me.json
+          python3 -c 'import json; assert json.load(open("/tmp/selena-me.json"))["email"] == "smoke@example.com"'
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -b /tmp/selena-cookies http://localhost:5173/api/manage/me/)
+          test "${status}" = "403"
+          curl -fsS -b /tmp/selena-cookies -c /tmp/selena-cookies \
+            -H "Accept: application/json" -H "X-CSRFToken: ${csrf}" \
+            -X POST http://localhost:5173/user/logout/ -o /tmp/selena-logout.json
+          python3 -c 'import json; assert json.load(open("/tmp/selena-logout.json"))["ok"]'
+          csrf=$(curl -fsS -c /tmp/selena-cookies -b /tmp/selena-cookies http://localhost:5173/user/csrf/ | python3 -c 'import json,sys; print(json.load(sys.stdin)["csrfToken"])')
+          curl -fsS -b /tmp/selena-cookies -c /tmp/selena-cookies \
+            -H "Accept: application/json" -H "X-CSRFToken: ${csrf}" \
+            --data-urlencode 'email=smoke@example.com' \
+            --data-urlencode 'password=TestPassword-2026!' \
+            http://localhost:5173/user/auth/ -o /tmp/selena-login.json
+          python3 -c 'import json; assert json.load(open("/tmp/selena-login.json"))["ok"]'
+      - name: Print container status and logs
+        if: always()
+        run: |
+          docker compose ps -a
+          docker compose logs --tail=80 db-init
+          docker compose logs --tail=80 web
+          docker compose logs --tail=80 frontend
+      - name: Stop stack
+        if: always()
+        run: docker compose down

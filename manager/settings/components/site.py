@@ -7,6 +7,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 TEMPLATES: Final[list[dict[str, Any]]] = [
@@ -27,3 +28,6 @@ TEMPLATES: Final[list[dict[str, Any]]] = [
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = PROJECT_ROOT / "media"

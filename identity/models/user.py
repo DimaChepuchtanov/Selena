@@ -23,6 +23,10 @@ class UserQuerySet(QuerySet['User']):
         return self.all()
 
     def create_user(self, login: str, password: str, **extra_fields) -> User:
+        if "role" not in extra_fields:
+            extra_fields["role"] = Role.objects.get(
+                role=Role.RoleChoices.USER
+            )
         user = self.model(login=login, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -60,8 +64,7 @@ class User(AbstractBaseUser):
 
     role: ForeignKey[Role, Role] = ForeignKey(
         to=Role,
-        on_delete=PROTECT,
-        default=lambda: Role.objects.get(uuid='ad369c1c-f1a8-47f4-9853-d4c50e2e4e6c'),
+        on_delete=PROTECT
     )
 
     objects: ClassVar[UserManager] = UserManager()

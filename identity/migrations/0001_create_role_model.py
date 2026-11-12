@@ -11,6 +11,10 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
+        migrations.RunSQL(
+            sql="CREATE SCHEMA IF NOT EXISTS identity",
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.CreateModel(
             name="Role",
             fields=[

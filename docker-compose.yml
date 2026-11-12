@@ -8,30 +8,99 @@ services:
       POSTGRES_PASSWORD: ${PG_PASSWORD:-change-me}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init/001_create_schemas.sql:/docker-entrypoint-initdb.d/001_create_schemas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  web:
-    build: .
-    restart: unless-stopped
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    restart: "no"
     environment:
       DJANGO_SETTINGS_MODULE: manager.settings.dev
       PG_HOST: db
-      PG_PORT: 5432
+      PG_PORT: "5432"
       PG_DATABASE: ${PG_DATABASE:-selena}
       PG_USER: ${PG_USER:-selena}
       PG_PASSWORD: ${PG_PASSWORD:-change-me}
-    ports:
-      - "${APP_PORT:-8000}:8000"
+      SECRET_KEY: ${SECRET_KEY:?Add SECRET_KEY to .env}
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - .:/app
+    command:
+      - sh
+      - -ec
+      - |
+        python manage.py shell -c "from pathlib import Path; from django.db import connection; sql = Path('db/init/001_create_schemas.sql').read_text(encoding='utf-8'); connection.cursor().execute(sql)"
+        python manage.py migrate --noinput
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: manager.settings.dev
+      PG_HOST: db
+      PG_PORT: "5432"
+      PG_DATABASE: ${PG_DATABASE:-selena}
+      PG_USER: ${PG_USER:-selena}
+      PG_PASSWORD: ${PG_PASSWORD:-change-me}
+      SECRET_KEY: ${SECRET_KEY:?Add SECRET_KEY to .env}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/catalog/', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    restart: unless-stopped
+    environment:
+      DJANGO_ORIGIN: http://web:8000
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      web:
+        condition: service_healthy
+    volumes:
+      - ./frontend:/app/frontend
+      - frontend_node_modules:/app/frontend/node_modules
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5173/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 8
+      start_period: 10s
 
 volumes:
   postgres_data:
+  frontend_node_modules:
