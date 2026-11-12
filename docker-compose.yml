@@ -15,6 +15,28 @@ services:
       timeout: 5s
       retries: 10
 
+  db-init:
+    build: .
+    restart: "no"
+    environment:
+      DJANGO_SETTINGS_MODULE: manager.settings.dev
+      PG_HOST: db
+      PG_PORT: 5432
+      PG_DATABASE: ${PG_DATABASE:-selena}
+      PG_USER: ${PG_USER:-selena}
+      PG_PASSWORD: ${PG_PASSWORD:-change-me}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command:
+      - sh
+      - -ec
+      - |
+        python manage.py shell -c "from django.db import connection; cursor = connection.cursor(); cursor.execute('CREATE SCHEMA IF NOT EXISTS identity'); cursor.execute('CREATE SCHEMA IF NOT EXISTS product'); cursor.close()"
+        python manage.py migrate --noinput
+
   web:
     build: .
     restart: unless-stopped
@@ -29,8 +51,8 @@ services:
     ports:
       - "${APP_PORT:-8000}:8000"
     depends_on:
-      db:
-        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
     volumes:
       - .:/app
 
