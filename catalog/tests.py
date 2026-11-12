@@ -184,3 +184,153 @@ class CatalogApiTests(TestCase):
             )
             schemas = {row[0] for row in cursor.fetchall()}
         self.assertEqual(schemas, {"identity", "product"})
+
+
+class CatalogExtendedTests(TestCase):
+    """Focused catalog regressions; uses isolated PostgreSQL test database."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.decks, _ = ProductCatalog.objects.get_or_create(name="Колоды")
+        cls.acc, _ = ProductCatalog.objects.get_or_create(name="Аксессуары")
+        cls.visible = ProductCard.objects.create(
+            name="Колода Солнце", describe="Слово для поиска: созвездие",
+            price=1200, stock=2, catalog=cls.decks, is_published=True,
+        )
+        cls.hidden = ProductCard.objects.create(
+            name="Черновик Луна", describe="Секрет", price=100,
+            stock=0, catalog=cls.decks, is_published=False,
+        )
+        cls.other = ProductCard.objects.create(
+            name="Чехол", describe="Аксессуар", price=200,
+            stock=1, catalog=cls.acc, is_published=True,
+        )
+
+    def login_admin(self):
+        role = Role.objects.get(role=Role.RoleChoices.ADMIN)
+        user = get_user_model().objects.create_user(
+            login="catalog-regression-admin@example.com",
+            password="LongTestPassword-2026!", role=role,
+        )
+        self.client.force_login(user)
+
+    def test_category_filter_and_hidden_draft(self):
+        response = self.client.get(f"/api/catalog/{self.decks.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            {item["uuid"] for item in response.json()},
+            {str(self.visible.pk)},
+        )
+
+    def test_listing_exposes_description_for_client_search(self):
+        response = self.client.get(f"/api/catalog/{self.decks.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["description"], self.visible.describe)
+
+    def test_product_without_image_returns_null_cover(self):
+        response = self.client.get(f"/api/catalog/{self.decks.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.json()[0]["image"])
+
+    def test_primary_image_is_first_in_details(self):
+        ProductImage.objects.create(
+            product=self.visible, img="products/secondary.png", is_primary=False,
+        )
+        ProductImage.objects.create(
+            product=self.visible, img="products/primary.png", is_primary=True,
+        )
+        with CaptureQueriesContext(connection) as sql:
+            response = self.client.get(f"/api/catalog/products/{self.visible.pk}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["images"], [
+            "/media/products/primary.png",
+            "/media/products/secondary.png",
+        ])
+        self.assertLessEqual(len(sql), 2, "Product detail must reuse prefetched images")
+
+    def test_unpublished_product_and_unknown_uuid_are_not_accessible(self):
+        self.assertEqual(
+            self.client.get(f"/api/catalog/products/{self.hidden.pk}/").status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.get(f"/api/catalog/products/{uuid4()}/").status_code,
+            404,
+        )
+
+    def test_regular_user_cannot_mutate_catalog(self):
+        self.client.force_login(get_user_model().objects.create_user(
+            login="catalog-buyer@example.com", password="LongTestPassword-2026!",
+        ))
+        response = self.client.post(
+            "/api/manage/catalogs/",
+            data=json.dumps({"name": "Запрещено"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_invalid_price_stock_and_catalog_are_rejected(self):
+        self.login_admin()
+        for name, price, stock, catalog_id in [
+            ("Отрицательная цена", -1, 1, self.decks.pk),
+            ("Отрицательный остаток", 10, -1, self.decks.pk),
+            ("Чужой каталог", 10, 1, 999999),
+        ]:
+            with self.subTest(name=name):
+                response = self.client.post(
+                    "/api/manage/products/",
+                    data=json.dumps({
+                        "name": name, "price": price, "stock": stock,
+                        "catalog": catalog_id,
+                    }),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, 400)
+
+    def test_case_insensitive_duplicate_name_is_rejected(self):
+        self.login_admin()
+        response = self.client.post(
+            "/api/manage/products/",
+            data=json.dumps({
+                "name": "колода солнце", "price": 10, "stock": 1,
+                "catalog": self.decks.pk,
+            }),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_publishing_and_unpublishing_updates_public_catalog(self):
+        self.login_admin()
+        url = f"/api/manage/products/{self.hidden.pk}/"
+        response = self.client.patch(
+            url, data=json.dumps({"is_published": True}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.client.get(f"/api/catalog/products/{self.hidden.pk}/").status_code,
+            200,
+        )
+        response = self.client.patch(
+            url, data=json.dumps({"is_published": False}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.client.get(f"/api/catalog/products/{self.hidden.pk}/").status_code,
+            404,
+        )
+
+    def test_price_stock_and_description_are_updated_in_public_detail(self):
+        self.login_admin()
+        response = self.client.patch(
+            f"/api/manage/products/{self.visible.pk}/",
+            data=json.dumps({"price": 2500, "stock": 0, "describe": "Обновлено"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        detail = self.client.get(f"/api/catalog/products/{self.visible.pk}/").json()
+        self.assertEqual(
+            (detail["price"], detail["stock"], detail["description"]),
+            (2500, 0, "Обновлено"),
+        )
