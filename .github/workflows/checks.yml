@@ -2,7 +2,7 @@ name: Selena checks
 
 on:
   push:
-    branches: [create-catalog, dev, prod-setting]
+    branches: [create-catalog, dev, prod-setting, vps-production]
   pull_request:
     branches: [create-catalog, dev, main]
 
@@ -195,3 +195,57 @@ jobs:
             exit 1
           fi
       - run: cd frontend && npm ci && npm audit --omit=dev --audit-level=high
+
+  vps-production-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create disposable production CI environment
+        run: |
+          cat > .env.production <<'EOF'
+          SITE_DOMAIN=example.test
+          DJANGO_SETTINGS_MODULE=manager.settings.prod
+          SECRET_KEY=ci-only-throwaway-secret-not-for-real-production-2026
+          PG_USER=selena
+          PG_PASSWORD=ci-postgres-test-password-only
+          PG_DATABASE=selena
+          PG_SSLMODE=prefer
+          USE_HTTPS=0
+          TRUST_PROXY_SSL_HEADER=0
+          HSTS_SECONDS=0
+          EOF
+      - name: Validate production Compose
+        run: docker compose --env-file .env.production -f compose.prod.yml config --quiet
+      - name: Build and start production containers
+        run: docker compose --env-file .env.production -f compose.prod.yml up -d --build
+      - name: Smoke test production React, Django, CSRF, database, media and static
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE=http://127.0.0.1:8080
+          curl --retry 25 --retry-delay 2 --retry-all-errors -fsS -H "Host: example.test" "$BASE/" -o /tmp/selena-prod-index.html
+          grep -q '<div id="root"></div>' /tmp/selena-prod-index.html
+          for path in /catalog /auth /reg /profile /manage /static/img/arcana.svg /django-static/admin/css/base.css /api/catalog/; do
+            curl -fsS -H "Host: example.test" "$BASE$path" -o /dev/null
+          done
+          csrf=$(curl -fsS -H "Host: example.test" -c /tmp/prod-cookies -b /tmp/prod-cookies "$BASE/user/csrf/" | python3 -c 'import sys,json;print(json.load(sys.stdin)["csrfToken"])')
+          curl -fsS -H "Host: example.test" -H "Accept: application/json" -H "X-CSRFToken: $csrf" \
+            -c /tmp/prod-cookies -b /tmp/prod-cookies \
+            --data-urlencode 'email=prod-smoke@example.com' \
+            --data-urlencode 'password=ProdSmokePassword-2026!' \
+            --data-urlencode 'password_confirm=ProdSmokePassword-2026!' \
+            --data-urlencode 'agreement=on' \
+            "$BASE/user/reg/" -o /tmp/registration.json
+          python3 -c 'import json;assert json.load(open("/tmp/registration.json"))["ok"]'
+          curl -fsS -H "Host: example.test" -b /tmp/prod-cookies "$BASE/api/me/" | python3 -c 'import sys,json;assert json.load(sys.stdin)["email"]=="prod-smoke@example.com"'
+          status=$(curl -sS -o /dev/null -w '%{http_code}' -H "Host: example.test" -b /tmp/prod-cookies "$BASE/api/manage/me/")
+          test "$status" = "403"
+          docker compose --env-file .env.production -f compose.prod.yml exec -T web python manage.py check --deploy --fail-level ERROR
+      - name: Dump container status and logs for diagnostics
+        if: always()
+        run: |
+          docker compose --env-file .env.production -f compose.prod.yml ps -a
+          docker compose --env-file .env.production -f compose.prod.yml logs --tail=75 db-init web frontend
+      - name: Clean up temporary CI test volumes
+        if: always()
+        run: docker compose --env-file .env.production -f compose.prod.yml down -v
