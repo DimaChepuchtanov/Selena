@@ -214,8 +214,16 @@ jobs:
           TRUST_PROXY_SSL_HEADER=0
           HSTS_SECONDS=0
           EOF
-      - name: Validate production Compose
-        run: docker compose --env-file .env.production -f compose.prod.yml config --quiet
+      - name: Validate production Compose and PostgreSQL healthcheck
+        run: |
+          docker compose --env-file .env.production -f compose.prod.yml config --quiet
+          python3 - <<'PY'
+          from pathlib import Path
+          compose = Path('compose.prod.yml').read_text()
+          assert 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}' in compose
+          assert '$${POSTGRES_USER}' not in compose
+          assert '$${POSTGRES_DB}' not in compose
+          PY
       - name: Build and start production containers
         run: docker compose --env-file .env.production -f compose.prod.yml up -d --build
       - name: Smoke test production React, Django, CSRF, database, media and static
