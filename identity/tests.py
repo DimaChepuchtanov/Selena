@@ -19,6 +19,14 @@ class AuthenticationTests(TestCase):
     def test_seeded_test_accounts_are_present_with_correct_roles_and_passwords(self):
         import os
 
+        from django.conf import settings
+
+        if settings.SETTINGS_MODULE.endswith(".prod"):
+            # Public deployments must never seed predictable development users.
+            self.assertFalse(get_user_model().objects.filter(login="root@mail.ru").exists())
+            self.assertFalse(get_user_model().objects.filter(login="user@mail.ru").exists())
+            return
+
         admin = get_user_model().objects.get(login="root@mail.ru")
         customer = get_user_model().objects.get(login="user@mail.ru")
         self.assertEqual(admin.role.role, Role.RoleChoices.ADMIN)

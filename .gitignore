@@ -9,3 +9,7 @@ __pycache__/
 .venv/
 node_modules/
 dist/
+# Django collected static files and local production outputs
+staticfiles/
+*.sqlite3
+*.sql.gz

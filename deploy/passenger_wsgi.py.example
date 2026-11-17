@@ -1,0 +1,19 @@
+"""REG.RU Passenger/WSGI template. This is NOT a drop-in installed file.
+
+Place an edited copy in the web application's document root only if
+REG.RU confirms that Python/Passenger is available on this Host-A account.
+Keep source code, virtualenv and .env OUTSIDE public document root.
+"""
+import os
+import sys
+
+PROJECT_ROOT = "/var/www/YOUR_ACCOUNT/data/selena"
+VENV_PYTHON = "/var/www/YOUR_ACCOUNT/data/selena-venv/bin/python"
+
+if sys.executable != VENV_PYTHON:
+    os.execl(VENV_PYTHON, VENV_PYTHON, *sys.argv)
+
+sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "manager.settings.prod")
+
+from manager.wsgi import application  # noqa: E402,F401
