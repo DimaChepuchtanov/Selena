@@ -1,0 +1,93 @@
+name: selena-prod
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PG_DATABASE:?Set PG_DATABASE in .env.production}
+      POSTGRES_USER: ${PG_USER:?Set PG_USER in .env.production}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in .env.production}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init/001_create_schemas.sql:/docker-entrypoint-initdb.d/001_create_schemas.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$${POSTGRES_USER} -d $$${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    security_opt: ["no-new-privileges:true"]
+  db-init:
+    image: selena-prod-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: backend
+    env_file: [.env.production]
+    environment:
+      DJANGO_SETTINGS_MODULE: manager.settings.prod
+      PG_HOST: db
+      PG_PORT: "5432"
+      PG_SSLMODE: prefer
+      SELENA_INTERNAL_DB: "1"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - django_static:/app/staticfiles
+      - media_data:/app/media
+    command: ["sh", "deploy/scripts/init-production.sh"]
+    restart: "no"
+    security_opt: ["no-new-privileges:true"]
+  web:
+    image: selena-prod-backend
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: backend
+    env_file: [.env.production]
+    environment:
+      DJANGO_SETTINGS_MODULE: manager.settings.prod
+      PG_HOST: db
+      PG_PORT: "5432"
+      PG_SSLMODE: prefer
+      SELENA_INTERNAL_DB: "1"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    volumes:
+      - django_static:/app/staticfiles:ro
+      - media_data:/app/media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(3); rc=s.connect_ex(('127.0.0.1',8000)); s.close(); raise SystemExit(rc)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    security_opt: ["no-new-privileges:true"]
+  frontend:
+    image: selena-prod-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: frontend
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - django_static:/django-static:ro
+      - media_data:/media:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  postgres_data:
+  django_static:
+  media_data:
