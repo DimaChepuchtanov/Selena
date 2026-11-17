@@ -54,7 +54,12 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 # Database is PostgreSQL; remote PostgreSQL connections must use TLS.
 DATABASES["default"]["CONN_MAX_AGE"] = 60
 db_host = str(DATABASES["default"]["HOST"]).strip().lower()
-remote_db = db_host not in {"localhost", "127.0.0.1", "::1", "/var/run/postgresql"}
+# The Docker service "db" uses a private, internal network.
+internal_docker_db = db_host == "db" and os.environ.get("SELENA_INTERNAL_DB") == "1"
+remote_db = (
+    db_host not in {"localhost", "127.0.0.1", "::1", "/var/run/postgresql"}
+    and not internal_docker_db
+)
 sslmode = os.environ.get("PG_SSLMODE", "require" if remote_db else "prefer")
 if remote_db and sslmode not in {"require", "verify-ca", "verify-full"}:
     raise RuntimeError("Remote PostgreSQL requires PG_SSLMODE=require, verify-ca or verify-full")
