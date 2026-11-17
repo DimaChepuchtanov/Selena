@@ -1,0 +1,3 @@
+-r requirements.txt
+# Only needed for the VPS/Gunicorn deployment (not REG.RU Passenger).
+gunicorn>=23,<27
