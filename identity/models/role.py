@@ -24,6 +24,7 @@ class Role(Model):
 
     role: CharField[str, str] = CharField(
         verbose_name="Наименование роли",
+        max_length=20,
         choices=RoleChoices.choices,
         default=RoleChoices.USER
     )

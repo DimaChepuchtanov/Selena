@@ -1,4 +1,15 @@
+.env
+.env.*
+!.env.example
+
+media/
 __pycache__/
 *.py[cod]
 
-.env
+.venv/
+node_modules/
+dist/
+# Django collected static files and local production outputs
+staticfiles/
+*.sqlite3
+*.sql.gz

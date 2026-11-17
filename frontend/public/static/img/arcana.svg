@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="430" viewBox="0 0 280 430" fill="none">
+<defs><linearGradient id="gold" x1="0" y1="0" x2="260" y2="430" gradientUnits="userSpaceOnUse"><stop stop-color="#F2DAAA"/><stop offset=".55" stop-color="#A98755"/><stop offset="1" stop-color="#E2C58B"/></linearGradient><radialGradient id="mist"><stop stop-color="#B29BD8" stop-opacity=".24"/><stop offset="1" stop-color="#5B4679" stop-opacity="0"/></radialGradient></defs>
+<rect width="280" height="430" rx="11" fill="#101022"/>
+<rect x="8" y="8" width="264" height="414" rx="6" stroke="url(#gold)" stroke-opacity=".9"/><rect x="15" y="15" width="250" height="400" rx="4" stroke="url(#gold)" stroke-opacity=".5"/>
+<circle cx="140" cy="208" r="118" fill="url(#mist)"/>
+<g stroke="url(#gold)" stroke-width=".8" opacity=".7"><circle cx="140" cy="208" r="100"/><circle cx="140" cy="208" r="87"/><circle cx="140" cy="208" r="64"/><path d="M140 95V321M27 208h226M60 128l160 160M220 128 60 288"/></g>
+<g stroke="url(#gold)" stroke-width="1" opacity=".73"><path d="M214.0 208.0 L222.0 208.0"/><path d="M211.5 227.2 L219.2 229.2"/><path d="M204.1 245.0 L211.0 249.0"/><path d="M192.3 260.3 L198.0 266.0"/><path d="M177.0 272.1 L181.0 279.0"/><path d="M159.2 279.5 L161.2 287.2"/><path d="M140.0 282.0 L140.0 290.0"/><path d="M120.8 279.5 L118.8 287.2"/><path d="M103.0 272.1 L99.0 279.0"/><path d="M87.7 260.3 L82.0 266.0"/><path d="M75.9 245.0 L69.0 249.0"/><path d="M68.5 227.2 L60.8 229.2"/><path d="M66.0 208.0 L58.0 208.0"/><path d="M68.5 188.8 L60.8 186.8"/><path d="M75.9 171.0 L69.0 167.0"/><path d="M87.7 155.7 L82.0 150.0"/><path d="M103.0 143.9 L99.0 137.0"/><path d="M120.8 136.5 L118.8 128.8"/><path d="M140.0 134.0 L140.0 126.0"/><path d="M159.2 136.5 L161.2 128.8"/><path d="M177.0 143.9 L181.0 137.0"/><path d="M192.3 155.7 L198.0 150.0"/><path d="M204.1 171.0 L211.0 167.0"/><path d="M211.5 188.8 L219.2 186.8"/></g>
+<path d="M152 151a62 62 0 1 0 52 94 70 70 0 1 1-52-94Z" fill="#CBAE78" opacity=".93"/>
+<path d="M129 173c-12 12-19 27-19 45 0 32 26 58 58 58 8 0 16-2 22-5" stroke="#F1DCA8" opacity=".48"/>
+<g fill="url(#gold)"><path d="m140 48 3.8 11.2L155 63l-11.2 3.8L140 78l-3.8-11.2L125 63l11.2-3.8z"/><path d="m140 337 3.4 10.6 10.6 3.4-10.6 3.4-3.4 10.6-3.4-10.6-10.6-3.4 10.6-3.4z"/><circle cx="69" cy="103" r="2"/><circle cx="214" cy="105" r="2"/><circle cx="47" cy="286" r="2"/><circle cx="233" cy="289" r="2"/></g>
+<path d="M101 375h78" stroke="url(#gold)" opacity=".5"/><text x="140" y="395" fill="#E5C88E" font-family="Georgia,serif" font-size="10" letter-spacing="4" text-anchor="middle">SELENA ZNAJU</text>
+<path d="m20 26 24 0-24 24m240-24-24 0 24 24M20 404l24 0-24-24m216 24-24 0 24-24" stroke="url(#gold)" stroke-opacity=".5"/>
+</svg>

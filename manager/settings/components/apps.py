@@ -14,6 +14,6 @@ INSTALLED_APPS: Final[list[str]] = [
     'drf_spectacular',
     # CUSTOM
     'identity',
-    'pages',
-    'profile_'
+    'profile_',
+    'catalog',
 ]

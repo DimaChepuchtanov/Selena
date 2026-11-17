@@ -14,6 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='role',
-            field=models.ForeignKey(default='Пользователь', on_delete=django.db.models.deletion.PROTECT, to='identity.role'),
+            # The FK points to a UUID; a text default ("Пользователь") is invalid.
+            # The role is assigned in UserManager.create_user instead.
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                to='identity.role',
+            ),
         ),
     ]

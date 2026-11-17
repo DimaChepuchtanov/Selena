@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.conf import settings
+from django.shortcuts import redirect
 
-# Create your views here.
+
 def profile_page(request):
-    if request.user.is_authenticated:
-        return render(request, "profile.html")
-    return redirect('/user/auth')
+    # Legacy Django URL; the actual profile page is rendered by React.
+    target = "/profile" if request.user.is_authenticated else "/auth?next=%2Fprofile"
+    return redirect(settings.FRONTEND_ORIGIN.rstrip("/") + target)
